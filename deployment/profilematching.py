@@ -3,10 +3,12 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import pickle
+import os
 
 # Load the PKL Placement Model
-with open("src/pkl_placement_model.pkl", 'rb') as file:
-    model = pickle.load(file)
+model_path = os.path.join(os.path.dirname(__file__), "..", "deployment/profilematching.pkl")
+    with open(model_path, "rb") as f:
+        model = pickle.load(f)
 
 # Streamlit UI
 def show():
