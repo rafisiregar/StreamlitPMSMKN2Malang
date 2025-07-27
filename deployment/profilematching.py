@@ -5,7 +5,7 @@ import pandas as pd
 import pickle
 
 # Load the PKL Placement Model
-with open("pkl_placement_model.pkl", 'rb') as file:
+with open("src/pkl_placement_model.pkl", 'rb') as file:
     model = pickle.load(file)
 
 # Streamlit UI
