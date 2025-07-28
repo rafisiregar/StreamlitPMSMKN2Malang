@@ -2,26 +2,10 @@ import pickle
 import streamlit as st  # type:ignore
 import pandas as pd  # Pastikan pandas diimpor
 import os
+from pklplacementmodel import PKLPlacementModel  # Import the model class from pklplacementmodel.py
 
 # Fungsi utama untuk menjalankan aplikasi Streamlit
 def show():
-    # Fungsi untuk memuat model pickle
-    def load_model():
-        model_path = os.path.join(os.path.dirname(__file__), "..", "deployment", "pkl_placement_model.pkl")
-        try:
-            with open(model_path, "rb") as f:
-                model = pickle.load(f)  # Memuat model
-            st.success("Model berhasil dimuat!")
-            return model
-        except FileNotFoundError:
-            st.error("File model tidak ditemukan!")
-            return None
-        except AttributeError as e:
-            st.error(f"Terjadi kesalahan: Model tidak dapat dimuat karena masalah atribut: {e}")
-            return None
-        except Exception as e:
-            st.error(f"Terjadi kesalahan saat memuat model: {e}")
-            return None
 
     # Fungsi untuk membaca file Excel
     def read_excel_file(uploaded_file):
@@ -35,9 +19,9 @@ def show():
             return None
 
     # Memuat model hanya sekali saat aplikasi dijalankan
-    model = load_model()
+    model = PKLPlacementModel()  # Instantiate the PKLPlacementModel
     if model is None:
-        return  # Jika model tidak dimuat, hentikan eksekusi lebih lanjut.
+        return  # If model is not loaded, stop further execution.
 
     st.title("🔍 Profile Matching for PKL Placement")
 
@@ -68,7 +52,6 @@ def show():
 
                 try:
                     # Lakukan prediksi menggunakan model
-                    # Pastikan metode inference ada pada model Anda
                     if hasattr(model, 'inference'):
                         total, predicted_label = model.inference(sub_aspek_data)
                     else:
