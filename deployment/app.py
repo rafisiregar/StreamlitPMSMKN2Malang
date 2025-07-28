@@ -1,6 +1,6 @@
 import streamlit as st # type:ignore
 import sidebar as sd
-import profilematching
+from . import profilematching
 import home
 
 # Set page config
