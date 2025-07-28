@@ -1,36 +1,26 @@
 import streamlit as st #type:ignore
 import pandas as pd
 import tempfile
-from pklplacementmodel import PKLPlacementModel  # pastikan model ini sudah ada
+from pklplacementmodel import PKLPlacementModel  # Import model
+
+# Fungsi untuk membaca file Excel
+def read_excel_file(uploaded_file):
+    try:
+        excel_file = pd.ExcelFile(uploaded_file)
+        sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
+        df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
+        return df
+    except Exception as e:
+        st.error(f"Error reading the Excel file: {e}")
+        return None
 
 # Fungsi utama untuk menjalankan aplikasi Streamlit
 def show():
-    
-    # Fungsi untuk membaca file Excel
-    def read_excel_file(uploaded_file):
-        try:
-            excel_file = pd.ExcelFile(uploaded_file)
-            sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
-            df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
-            return df
-        except Exception as e:
-            st.error(f"Error reading the Excel file: {e}")
-            return None
-
-    # Fungsi untuk membersihkan dan memvalidasi data
-    def clean_data(df):
-        df_cleaned = df.iloc[:, :11].apply(pd.to_numeric, errors='coerce')  # Mengubah kolom A1-A11 ke numerik
-        if df_cleaned.isnull().values.any():
-            st.warning("Beberapa nilai dalam data tidak valid. Nilai tersebut akan diperlakukan sebagai NaN.")
-            df_cleaned = df_cleaned.fillna(0)  # Mengisi NaN dengan 0
-        return df_cleaned
-
-    # Instansiasi model
-    model = PKLPlacementModel()  # Pastikan model ini sudah ada dan dapat diimpor
+    # Inisialisasi model PKLPlacementModel
+    model = PKLPlacementModel()
 
     st.title("🔍 Profile Matching for PKL Placement")
 
-    # Proses upload dan inferensi
     uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
 
     if uploaded_file:
@@ -44,13 +34,17 @@ def show():
                 st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
                 return
 
-            # Membersihkan data
-            df_cleaned = clean_data(df)
+            # Pemetaan sub-aspek ke kode A1-A11
+            sub_aspek_mapping = model.map_sub_aspek_to_kode()
+
+            # Menampilkan pemetaan sub-aspek ke kode
+            st.subheader("Pemetaan Sub-Aspek ke Kode:")
+            st.write(sub_aspek_mapping)
 
             # Tombol untuk memulai prediksi
             if st.button("🔍 Lakukan Prediksi"):
                 predictions = []  # Menyimpan hasil prediksi untuk setiap baris
-                for index, row in df_cleaned.iterrows():
+                for index, row in df.iterrows():
                     sub_aspek_data = row[:11].values.tolist()  # Mengambil data A1-A11
                     try:
                         total, predicted_label = model.inference(sub_aspek_data)
