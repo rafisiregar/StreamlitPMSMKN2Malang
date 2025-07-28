@@ -13,6 +13,7 @@ page = sd.render_sidebar()
 if page == "Home":
     home.show() 
 elif page == "PKL Placement":
-    pklsmk2.show() 
+    pklsmk2.show()
+    pklsmk2.manual_inference() 
 else:
     pass  
