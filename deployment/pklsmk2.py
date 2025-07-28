@@ -42,7 +42,7 @@ def show():
             sub_aspek_data = sub_aspek_data.tolist()
 
             # Make prediction
-            total, predicted_label = model.infer(sub_aspek_data)
+            total, predicted_label = model.inference(sub_aspek_data)
 
             # Output the prediction
             st.markdown("### 📌 Hasil Prediksi Model")
@@ -82,7 +82,7 @@ def show():
             for idx, row in df_2.iterrows():
                 sub_aspek_data = row[:11].values  # Assuming the first 11 columns are sub-aspects
                 sub_aspek_data = sub_aspek_data.tolist()
-                total, predicted_label = model.infer(sub_aspek_data)
+                total, predicted_label = model.inference(sub_aspek_data)
                 results.append(predicted_label)
 
             # Add the prediction results as a new column
