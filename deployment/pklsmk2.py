@@ -1,7 +1,19 @@
-import streamlit as st #type:ignore
+import streamlit as st  # type: ignore
 import pandas as pd
 import openpyxl
+import tempfile
 from pklplacementmodel import PKLPlacementModel  # Import model
+
+# Fungsi untuk membaca file Excel
+def read_excel_file(uploaded_file):
+    try:
+        excel_file = pd.ExcelFile(uploaded_file)
+        sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
+        df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
+        return df
+    except Exception as e:
+        st.error(f"Error reading the Excel file: {e}")
+        return None
 
 # Fungsi untuk melakukan inference manual
 def manual_inference():
@@ -58,6 +70,9 @@ def show():
                 if df.shape[1] < 11:
                     st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
                     return
+
+                # Inisialisasi model PKLPlacementModel
+                model = PKLPlacementModel()
 
                 # Pemetaan sub-aspek ke kode A1-A11
                 sub_aspek_mapping = model.map_sub_aspek_to_kode()
