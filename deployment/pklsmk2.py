@@ -17,6 +17,18 @@ def show():
             st.error(f"Error reading the Excel file: {e}")
             return None
 
+    # Function to clean and validate data
+    def clean_data(df):
+        # Convert the first 11 columns to numeric, coercing errors (non-numeric values will become NaN)
+        df_cleaned = df.iloc[:, :11].apply(pd.to_numeric, errors='coerce')
+        
+        # Check if there are any NaN values after conversion
+        if df_cleaned.isnull().values.any():
+            st.warning("Beberapa nilai dalam data tidak valid (misalnya kosong atau teks). Nilai tersebut akan diperlakukan sebagai NaN.")
+            # Handle missing data (NaN), either fill with default value (like 0 or mean) or drop the rows
+            df_cleaned = df_cleaned.fillna(0)  # Or use df_cleaned.dropna() to remove rows with NaN
+        return df_cleaned
+
     # Instantiate the model once when the app starts
     model = PKLPlacementModel()  # Instantiate the PKLPlacementModel
 
@@ -39,6 +51,9 @@ def show():
                 st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
                 return
 
+            # Clean the data by converting to numeric and handling missing values
+            df_cleaned = clean_data(df)
+
             # Select actual PKL label
             st.markdown("### 📝 Pilih label sebenarnya (aktual):")
             pkl_labels = ["Mobile Engineering", "Software Engineering", "Internet of Things"]
@@ -46,8 +61,8 @@ def show():
 
             # Button to submit and make predictions
             if st.button("🔍 Submit & Prediksi"):
-                # Reading the first row of data (A1-A11 columns) for inference
-                sub_aspek_data = df.iloc[0, :11].values  # Take data from the first row
+                # Reading the first row of cleaned data (A1-A11 columns) for inference
+                sub_aspek_data = df_cleaned.iloc[0, :11].values  # Take data from the first row
                 sub_aspek_data = sub_aspek_data.tolist()
 
                 try:
