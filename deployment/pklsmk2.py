@@ -4,19 +4,21 @@ import numpy as np
 import pandas as pd
 import pickle
 import os
+from pklsmk2 import PKLPlacementModel  # Mengimpor kelas di sini
 
 # Streamlit UI
 def show():
-    # Load the PKL Placement Model
+    # Path ke file model pickle yang sudah disimpan
     try:
         model_path = os.path.join(os.path.dirname(__file__), "..", "deployment", "pkl_placement_model.pkl")
         with open(model_path, "rb") as f:
-            model = pickle.load(f)
+            model = pickle.load(f)  # Memuat model pickle
+        st.success("Model berhasil dimuat!")
     except FileNotFoundError:
-        st.error("Model file not found!")
+        st.error("File model tidak ditemukan!")
         return
     except Exception as e:
-        st.error(f"Error loading model: {e}")
+        st.error(f"Terjadi kesalahan saat memuat model: {e}")
         return
 
     st.title("🔍 Profile Matching for PKL Placement")
@@ -26,6 +28,7 @@ def show():
     st.markdown("Unggah data sub-aspek untuk memprediksi penempatan PKL berdasarkan **Mobile Engineering**, **Software Engineering**, atau **Internet of Things**.")
     
     uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
+    
 
     if uploaded_file:
         st.subheader("📊 Data yang Diunggah")

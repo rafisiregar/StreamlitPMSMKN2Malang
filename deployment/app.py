@@ -1,6 +1,6 @@
 import streamlit as st  # type:ignore
 import sidebar as sd
-import pklsmk2
+import pklsmk2 
 import home
 
 # Set page config
