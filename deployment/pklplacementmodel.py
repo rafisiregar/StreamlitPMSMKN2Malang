@@ -93,9 +93,9 @@ class PKLPlacementModel:
         nilai_siswa = self.konversi(sub_aspek)
 
         jenis_pkl_tiap_label = {
-            "Mobile Engineering": [8, 8, 8, 7, 7, 7, 7, 8, 3, 3, 7],
-            "Software Engineering": [8, 8, 8, 7, 7, 7, 7, 3, 8, 3, 7],
-            "Internet of Things": [8, 8, 7, 7, 7, 7, 7, 3, 3, 8, 7]
+            "Mobile Engineering"	: [8, 8, 8, 7, 7, 7, 7, 8, 3, 3, 7],
+            "Software Engineering"	: [8, 8, 8, 7, 7, 7, 7, 3, 8, 3, 7],
+            "Internet of Things"	: [8, 8, 7, 7, 7, 7, 7, 3, 3, 8, 7]
         }
 
         nilai_gap_standar_pkl = jenis_pkl_tiap_label[jenis_pkl]
