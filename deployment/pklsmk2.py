@@ -10,9 +10,10 @@ def read_excel_file(uploaded_file):
         sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
         df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
         
-        # Convert only the first 11 columns to numeric, coercing errors to NaN
-        df.iloc[:, :11] = df.iloc[:, :11].apply(pd.to_numeric, errors='coerce')
-
+                # Convert only the first 11 columns to numeric, coercing errors to NaN
+        for column in ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11']:
+                    if column in df.columns:
+                        df[column] = pd.to_numeric(df[column], errors='coerce')
         return df, sheet_name
     
     except Exception as e:
