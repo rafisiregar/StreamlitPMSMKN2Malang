@@ -1,4 +1,4 @@
-import streamlit as st #type:ignore
+import streamlit as st  # type:ignore
 import pandas as pd
 import tempfile
 from pklplacementmodel import PKLPlacementModel  # Import model
@@ -23,6 +23,15 @@ def show():
 
     uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
 
+    # Menambahkan contoh input data untuk inferensi manual
+    sub_aspek_input = [90, 85, 88, 76, 89, 90, 92, 80, 85, 87, 6]  # Contoh input
+    total, predicted_label = model.inference(sub_aspek_input)  # Proses inferensi manual
+
+    st.subheader("Hasil Inferensi Manual")
+    st.write(f"Nilai Total: {total}")
+    st.write(f"Penempatan PKL terbaik: {predicted_label}")
+
+    # Lanjutkan dengan bagian untuk upload file dan prediksi seperti biasa
     if uploaded_file:
         df = read_excel_file(uploaded_file)
         if df is not None:
