@@ -8,13 +8,19 @@ import os
 # Streamlit UI
 def show():
     # Load the PKL Placement Model
-    model_path = os.path.join(os.path.dirname(__file__), "..", "deployment/pkl_placement_model.pkl")
-    
-    with open(model_path, "rb") as f:  # Correct indentation here
-        model = pickle.load(f)
-            
+    try:
+        model_path = os.path.join(os.path.dirname(__file__), "..", "deployment", "pkl_placement_model.pkl")
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
+    except FileNotFoundError:
+        st.error("Model file not found!")
+        return
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return
+
     st.title("🔍 Profile Matching for PKL Placement")
-    
+
     # First inference - Profile Matching (similar to previous)
     st.markdown("### 1. Prediksi Penempatan PKL Berdasarkan Data Sub-Aspek")
     st.markdown("Unggah data sub-aspek untuk memprediksi penempatan PKL berdasarkan **Mobile Engineering**, **Software Engineering**, atau **Internet of Things**.")
@@ -24,20 +30,26 @@ def show():
     if uploaded_file:
         st.subheader("📊 Data yang Diunggah")
         # Read Excel file to show sheet names
-        excel_file = pd.ExcelFile(uploaded_file)
-        st.write("Pilih sheet yang ingin digunakan:")
-        sheet_name = st.selectbox("Sheet", excel_file.sheet_names)
-        
-        # Load the selected sheet
-        df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
-        st.dataframe(df.head())  # Show a preview of the data
+        try:
+            excel_file = pd.ExcelFile(uploaded_file)
+            st.write("Pilih sheet yang ingin digunakan:")
+            sheet_name = st.selectbox("Sheet", excel_file.sheet_names)
+            df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
+            st.dataframe(df.head())  # Show a preview of the data
+        except Exception as e:
+            st.error(f"Error reading the Excel file: {e}")
+            return
 
         st.markdown("### 📝 Pilih label sebenarnya (aktual):")
         pkl_labels = ["Mobile Engineering", "Software Engineering", "Internet of Things"]
         selected_label = st.radio("Pilih kategori aktual PKL:", options=pkl_labels)
 
         if st.button("🔍 Submit & Prediksi"):
-            # Assuming columns A1, A2, ..., A11 represent the sub-aspect data for the student
+            # Validate data and run inference
+            if df.shape[1] < 11:
+                st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
+                return
+
             sub_aspek_data = df.iloc[0, :11].values  # Assuming the first row contains the sub-aspect values
             sub_aspek_data = sub_aspek_data.tolist()
 
@@ -67,16 +79,22 @@ def show():
     uploaded_file_2 = st.file_uploader("📤 Upload file data (Excel format) untuk menambah kolom hasil penempatan", type=["xlsx"])
 
     if uploaded_file_2:
-        # Read Excel file to show sheet names
-        excel_file_2 = pd.ExcelFile(uploaded_file_2)
-        st.write("Pilih sheet yang ingin digunakan:")
-        sheet_name_2 = st.selectbox("Sheet", excel_file_2.sheet_names)
-        
-        # Load the selected sheet
-        df_2 = pd.read_excel(uploaded_file_2, sheet_name=sheet_name_2)
-        st.dataframe(df_2.head())  # Show a preview of the data
+        try:
+            excel_file_2 = pd.ExcelFile(uploaded_file_2)
+            st.write("Pilih sheet yang ingin digunakan:")
+            sheet_name_2 = st.selectbox("Sheet", excel_file_2.sheet_names)
+            df_2 = pd.read_excel(uploaded_file_2, sheet_name=sheet_name_2)
+            st.dataframe(df_2.head())  # Show a preview of the data
+        except Exception as e:
+            st.error(f"Error reading the Excel file: {e}")
+            return
 
         if st.button("🔍 Submit & Tambah Hasil Penempatan"):
+            # Validate data
+            if df_2.shape[1] < 11:
+                st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
+                return
+
             # Predict PKL placement for each row based on sub-aspect data (A1, A2, ..., A11)
             results = []
             for idx, row in df_2.iterrows():
