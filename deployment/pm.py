@@ -5,13 +5,13 @@ import pandas as pd
 import pickle
 import os
 
-# Load the PKL Placement Model
-model_path = os.path.join(os.path.dirname(__file__), "..", "deployment/pkl_placement_model.pkl")
-    with open(model_path, "rb") as f:
-        model = pickle.load(f)
-
 # Streamlit UI
 def show():
+    # Load the PKL Placement Model
+    model_path = os.path.join(os.path.dirname(__file__), "..", "deployment/pkl_placement_model.pkl")
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
+            
     st.title("🔍 Profile Matching for PKL Placement")
     
     # First inference - Profile Matching (similar to previous)
