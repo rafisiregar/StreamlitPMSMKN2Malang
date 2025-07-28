@@ -44,18 +44,28 @@ def process_file_upload(uploaded_file):
     st.subheader("📊 Data yang Diunggah")
     st.dataframe(df.head())  # Show data preview
 
+    # Data cleaning - convert all values to numeric, handle missing values
+    numeric_df = df.iloc[:, :11].apply(pd.to_numeric, errors='coerce')  # Convert first 11 columns to numeric
+    numeric_df = numeric_df.fillna(0)  # Replace NaN with 0 or another appropriate value
+    
+    # Validate numeric conversion
+    if numeric_df.isnull().values.any():
+        st.warning("Beberapa nilai tidak bisa dikonversi ke angka dan diganti dengan 0")
+
     model = PKLPlacementModel()
     predictions = []
     
     with st.spinner("Sedang memproses data..."):
-        for index, row in df.iterrows():
-            sub_aspek_data = row[:11].values.tolist()  # Get A1-A11 data
+        for index, row in numeric_df.iterrows():
+            sub_aspek_data = row.values.tolist()  # Get cleaned numeric data
             try:
                 total, predicted_label = model.inference(sub_aspek_data)
                 predictions.append(predicted_label)
             except Exception as e:
-                st.error(f"Error processing row {index}: {e}")
+                st.error(f"Error processing row {index+2}: {e}")  # +2 because Excel rows start at 1 and header is row 1
                 predictions.append("Error")
+                # Show the problematic row data
+                st.write(f"Problematic row data: {row.values.tolist()}")
 
     df['Penempatan PKL'] = predictions
     
