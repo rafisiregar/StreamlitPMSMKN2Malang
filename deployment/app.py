@@ -1,6 +1,6 @@
 import streamlit as st # type:ignore
 import sidebar as sd
-import pm
+import pklsmk2
 import home
 
 # Set page config
@@ -10,6 +10,6 @@ page = sd.render_sidebar()
 if page == "Home":
     home.show()
 elif page == "PKL Placement":
-    pm.show()
+    pklsmk2.show()
 else:
     pass

@@ -9,8 +9,9 @@ import os
 def show():
     # Load the PKL Placement Model
     model_path = os.path.join(os.path.dirname(__file__), "..", "deployment/pkl_placement_model.pkl")
-        with open(model_path, "rb") as f:
-            model = pickle.load(f)
+    
+    with open(model_path, "rb") as f:  # Correct indentation here
+        model = pickle.load(f)
             
     st.title("🔍 Profile Matching for PKL Placement")
     
