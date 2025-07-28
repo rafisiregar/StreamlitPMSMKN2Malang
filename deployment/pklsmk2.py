@@ -1,8 +1,6 @@
-# type: ignore
-import streamlit as st
-import numpy as np
-import pandas as pd
 import pickle
+import streamlit as st # type:ignore
+import pandas as pd
 import os
 
 # Fungsi untuk memuat model pickle
@@ -31,7 +29,7 @@ def read_excel_file(uploaded_file):
         st.error(f"Error reading the Excel file: {e}")
         return None
 
-# Streamlit UI
+# Fungsi untuk menjalankan antarmuka Streamlit
 def show():
     # Memuat model hanya sekali saat aplikasi dijalankan
     model = load_model()
@@ -129,7 +127,3 @@ def show():
                     file_name="updated_pkl_placement_result.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-
-# Menjalankan aplikasi Streamlit
-if __name__ == "__main__":
-    show()
