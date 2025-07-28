@@ -14,12 +14,6 @@ if page == "Home":
     home.show() 
 elif page == "PKL Placement":
     # Display PKL Placement page content
-    pklsmk2.show()  
-    
-    # Check if manual_inference() function is properly defined and displayed
-    try:
-        pklsmk2.manual_inference()  # Call manual_inference function here
-    except Exception as e:
-        st.error(f"Error occurred in manual_inference: {e}")
+    pklsmk2.main()  
 else:
     pass

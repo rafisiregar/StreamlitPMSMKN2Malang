@@ -1,107 +1,119 @@
-import streamlit as st  # type: ignore
+import streamlit as st #ignore: type
 import pandas as pd
-import openpyxl
 import tempfile
 from pklplacementmodel import PKLPlacementModel  # Import model
 
-# Fungsi utama untuk menjalankan aplikasi Streamlit
-def show():
-    st.title("🔍 Profile Matching for PKL Placement")
+# Constants
+SUB_ASPECTS = [
+    "Informatika (A1)",
+    "Dasar Program Keahlian (A2)",
+    "Projek Kreatif dan Kewirausahaan (A3)",
+    "Perencanaan dan Pengalamatan Jaringan (A4)",
+    "Administrasi Sistem Jaringan (A5)",
+    "Teknologi Jaringan Kabel dan Nirkabel (A6)",
+    "Pemasangan dan Konfigurasi Perangkat Jaringan (A7)",
+    "Samsung Tech Institute (A8)",
+    "Pemrograman Web (A9)",
+    "Internet of Things (A10)",
+    "Jarak (A11)"
+]
 
-    # Menu untuk memilih mode input
-    menu = ["Upload File", "Manual Input"]
-    choice = st.sidebar.selectbox("Pilih Mode", menu)
-
-    # Fungsi untuk membaca file Excel
-    def read_excel_file(uploaded_file):
-        try:
-            excel_file = pd.ExcelFile(uploaded_file)
-            sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
-            df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
-            return df
-        except Exception as e:
-            st.error(f"Error reading the Excel file: {e}")
-            return None
-
-    # Upload File Inference
-    if choice == "Upload File":
-        uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
+def read_excel_file(uploaded_file):
+    """Read and validate the uploaded Excel file."""
+    try:
+        excel_file = pd.ExcelFile(uploaded_file)
+        sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
+        df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
         
-        if uploaded_file:
-            df = read_excel_file(uploaded_file)
-            if df is not None:
-                st.subheader("📊 Data yang Diunggah")
-                st.dataframe(df.head())  # Menampilkan preview dari data yang diupload
+        # Validate the dataframe
+        if df.shape[1] < 11:
+            st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
+            return None
+            
+        return df
+    except Exception as e:
+        st.error(f"Error reading the Excel file: {e}")
+        return None
 
-                # Pastikan data memiliki minimal 11 kolom (A1-A11)
-                if df.shape[1] < 11:
-                    st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
-                    return
+def process_file_upload(uploaded_file):
+    """Process the uploaded file and return predictions."""
+    df = read_excel_file(uploaded_file)
+    if df is None:
+        return None
+        
+    st.subheader("📊 Data yang Diunggah")
+    st.dataframe(df.head())  # Show data preview
 
-                # Inisialisasi model PKLPlacementModel
-                model = PKLPlacementModel()
-
-                # Pemetaan sub-aspek ke kode A1-A11
-                sub_aspek_mapping = model.map_sub_aspek_to_kode()
-
-                # Menampilkan pemetaan sub-aspek ke kode
-                st.subheader("Pemetaan Sub-Aspek ke Kode:")
-                st.write(sub_aspek_mapping)
-
-                # Tombol untuk memulai prediksi
-                if st.button("🔍 Lakukan Prediksi"):
-                    predictions = []  # Menyimpan hasil prediksi untuk setiap baris
-                    for index, row in df.iterrows():
-                        sub_aspek_data = row[:11].values.tolist()  # Mengambil data A1-A11
-                        try:
-                            total, predicted_label = model.inference(sub_aspek_data)
-                            predictions.append(predicted_label)  # Menyimpan label prediksi
-                        except Exception as e:
-                            predictions.append("Error")  # Jika terjadi error, simpan 'Error'
-
-                    # Menambahkan hasil prediksi ke dataframe
-                    df['Penempatan PKL'] = predictions
-
-                    # Menyimpan hasil dataframe ke dalam file Excel sementara
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmpfile:
-                        output_file = tmpfile.name
-                        df.to_excel(output_file, index=False)
-
-                    # Menampilkan tombol download untuk file yang telah diperbarui
-                    st.download_button(
-                        label="Download File dengan Hasil Penempatan",
-                        data=open(output_file, 'rb'),
-                        file_name="updated_pkl_placement_result.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-
-    # Manual Input Inference
-    elif choice == "Manual Input":
-        st.title("🔍 Manual Profile Matching for PKL Placement")
-        model = PKLPlacementModel()
-
-        # Input fields for A1 to A11
-        A1 = st.number_input("Informatika (A1)", min_value=0, max_value=100, step=1)
-        A2 = st.number_input("Dasar Program Keahlian (A2)", min_value=0, max_value=100, step=1)
-        A3 = st.number_input("Projek Kreatif dan Kewirausahaan (A3)", min_value=0, max_value=100, step=1)
-        A4 = st.number_input("Perencanaan dan Pengalamatan Jaringan (A4)", min_value=0, max_value=100, step=1)
-        A5 = st.number_input("Administrasi Sistem Jaringan (A5)", min_value=0, max_value=100, step=1)
-        A6 = st.number_input("Teknologi Jaringan Kabel dan Nirkabel (A6)", min_value=0, max_value=100, step=1)
-        A7 = st.number_input("Pemasangan dan Konfigurasi Perangkat Jaringan (A7)", min_value=0, max_value=100, step=1)
-        A8 = st.number_input("Samsung Tech Institute (A8)", min_value=0, max_value=100, step=1)
-        A9 = st.number_input("Pemrograman Web (A9)", min_value=0, max_value=100, step=1)
-        A10 = st.number_input("Internet of Things (A10)", min_value=0, max_value=100, step=1)
-        A11 = st.number_input("Jarak (A11)", min_value=0, max_value=100, step=1)
-
-        # Button to trigger the inference
-        if st.button("🔍 Lakukan Prediksi Manual"):
-            # Collect input data
-            sub_aspek_data = [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11]
+    model = PKLPlacementModel()
+    predictions = []
+    
+    with st.spinner("Sedang memproses data..."):
+        for index, row in df.iterrows():
+            sub_aspek_data = row[:11].values.tolist()  # Get A1-A11 data
             try:
                 total, predicted_label = model.inference(sub_aspek_data)
-                st.subheader(f"Hasil Prediksi: {predicted_label}")
+                predictions.append(predicted_label)
             except Exception as e:
-                st.error(f"Error during prediction: {e}")
+                st.error(f"Error processing row {index}: {e}")
+                predictions.append("Error")
+
+    df['Penempatan PKL'] = predictions
+    
+    # Create downloadable file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmpfile:
+        output_file = tmpfile.name
+        df.to_excel(output_file, index=False)
+    
+    return output_file
+
+def show_manual_input():
+    """Show manual input form and process results."""
+    st.subheader("Input Manual")
+    
+    inputs = []
+    for i, aspect in enumerate(SUB_ASPECTS):
+        inputs.append(st.number_input(aspect, min_value=0, max_value=100, step=1, key=f"input_{i}"))
+    
+    if st.button("🔍 Lakukan Prediksi Manual", key="manual_predict"):
+        model = PKLPlacementModel()
+        try:
+            total, predicted_label = model.inference(inputs)
+            st.success(f"Hasil Prediksi: {predicted_label}")
+            st.write(f"Total Skor: {total}")
+        except Exception as e:
+            st.error(f"Error during prediction: {e}")
+
+def main():
+    """Main application function."""
+    st.set_page_config(page_title="PKL Placement", layout="wide")
+    
+    st.title("🔍 Profile Matching for PKL Placement")
+    st.write("Aplikasi ini membantu menentukan penempatan PKL yang sesuai berdasarkan profil akademik siswa.")
+    
+    # Sidebar navigation
+    st.sidebar.title("Navigasi")
+    mode = st.sidebar.radio("Pilih Mode", ["Upload File", "Manual Input"])
+    
+    if mode == "Upload File":
+        st.subheader("Upload File Excel")
+        uploaded_file = st.file_uploader(
+            "📤 Upload file data (Excel format)", 
+            type=["xlsx"],
+            help="Unggah file Excel dengan minimal 11 kolom sub-aspek (A1-A11)"
+        )
+        
+        if uploaded_file:
+            output_file = process_file_upload(uploaded_file)
+            if output_file:
+                st.success("Proses prediksi selesai!")
+                st.download_button(
+                    label="📥 Download File dengan Hasil Penempatan",
+                    data=open(output_file, 'rb'),
+                    file_name="hasil_penempatan_pkl.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+    else:
+        show_manual_input()
 
 if __name__ == "__main__":
-    show()
+    main()
