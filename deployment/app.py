@@ -11,3 +11,5 @@ if page == "Home":
     home.show()
 elif page == "PKL Placement":
     profilematching.show()
+else:
+    pass
