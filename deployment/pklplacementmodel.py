@@ -5,6 +5,7 @@ class PKLPlacementModel:
         self.sub_aspek_mapping = self.map_sub_aspek_to_kode()
 
     def map_sub_aspek_to_kode(self):
+        # Memetakan nama sub-aspek ke A1-A11
         data = [
             ("Informatika", "A1"),
             ("Dasar Program Keahlian", "A2"),
@@ -19,6 +20,21 @@ class PKLPlacementModel:
             ("Jarak", "A11")
         ]
         return {item[0]: item[1] for item in data}
+
+    def map_columns_to_A(self, df):
+        """
+        Fungsi untuk mengganti nama kolom yang sesuai dengan sub-aspek menjadi A1, A2, ..., A11
+        Jika kolom sudah menggunakan A1, A2, ..., A11, maka tidak akan diubah.
+        """
+        sub_aspek = list(self.sub_aspek_mapping.keys())
+        A_columns = list(self.sub_aspek_mapping.values())
+        
+        # Membuat mapping nama kolom yang sesuai dengan sub-aspek
+        column_mapping = {sub_aspek[i]: A_columns[i] for i in range(len(sub_aspek))}
+        
+        # Ganti nama kolom jika kolom tersebut sesuai dengan sub-aspek
+        df.columns = [column_mapping.get(col, col) for col in df.columns]
+        return df
 
     def kisaran_rapot(self, rapot):
         if 95 <= rapot <= 100:
