@@ -1,6 +1,6 @@
 import streamlit as st #type:ignore
 import pandas as pd
-import openpyxl
+import tempfile
 from pklplacementmodel import PKLPlacementModel  # pastikan model ini sudah ada
 
 # Fungsi utama untuk menjalankan aplikasi Streamlit
@@ -47,31 +47,32 @@ def show():
             # Membersihkan data
             df_cleaned = clean_data(df)
 
-            # Melakukan prediksi untuk setiap baris data
-            st.markdown("### 📝 Melakukan Prediksi untuk setiap baris data")
-            predictions = []  # Menyimpan hasil prediksi untuk setiap baris
-            for index, row in df_cleaned.iterrows():
-                sub_aspek_data = row[:11].values.tolist()  # Mengambil data A1-A11
-                try:
-                    total, predicted_label = model.inference(sub_aspek_data)
-                    predictions.append(predicted_label)  # Menyimpan label prediksi
-                except Exception as e:
-                    predictions.append("Error")  # Jika terjadi error, simpan 'Error'
+            # Tombol untuk memulai prediksi
+            if st.button("🔍 Lakukan Prediksi"):
+                predictions = []  # Menyimpan hasil prediksi untuk setiap baris
+                for index, row in df_cleaned.iterrows():
+                    sub_aspek_data = row[:11].values.tolist()  # Mengambil data A1-A11
+                    try:
+                        total, predicted_label = model.inference(sub_aspek_data)
+                        predictions.append(predicted_label)  # Menyimpan label prediksi
+                    except Exception as e:
+                        predictions.append("Error")  # Jika terjadi error, simpan 'Error'
 
-            # Menambahkan hasil prediksi ke dataframe
-            df['Penempatan PKL'] = predictions
+                # Menambahkan hasil prediksi ke dataframe
+                df['Penempatan PKL'] = predictions
 
-            # Menyimpan hasil dataframe ke dalam file Excel
-            output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
-            df.to_excel(output_file, index=False)
+                # Menyimpan hasil dataframe ke dalam file Excel sementara
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmpfile:
+                    output_file = tmpfile.name
+                    df.to_excel(output_file, index=False)
 
-            # Menampilkan tombol download untuk file yang telah diperbarui
-            st.download_button(
-                label="Download File dengan Hasil Penempatan",
-                data=open(output_file, 'rb'),
-                file_name="updated_pkl_placement_result.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+                # Menampilkan tombol download untuk file yang telah diperbarui
+                st.download_button(
+                    label="Download File dengan Hasil Penempatan",
+                    data=open(output_file, 'rb'),
+                    file_name="updated_pkl_placement_result.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
 
 if __name__ == "__main__":
     show()
