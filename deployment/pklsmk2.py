@@ -15,17 +15,11 @@ def read_excel_file(uploaded_file):
         st.error(f"Error reading the Excel file: {e}")
         return None
 
-# Fungsi untuk melakukan inference manual
 def manual_inference():
-    # Inisialisasi model PKLPlacementModel
+    st.title("🔍 Manual Profile Matching for PKL Placement")
     model = PKLPlacementModel()
 
-    st.title("🔍 Manual Profile Matching for PKL Placement")
-
-    # Input untuk A1-A11
-    st.subheader("🔢 Input Data untuk A1 - A11")
-    
-    # Membuat input field untuk setiap sub-aspek
+    # Input fields for A1 to A11
     A1 = st.number_input("Informatika (A1)", min_value=0, max_value=100, step=1)
     A2 = st.number_input("Dasar Program Keahlian (A2)", min_value=0, max_value=100, step=1)
     A3 = st.number_input("Projek Kreatif dan Kewirausahaan (A3)", min_value=0, max_value=100, step=1)
@@ -38,13 +32,11 @@ def manual_inference():
     A10 = st.number_input("Internet of Things (A10)", min_value=0, max_value=100, step=1)
     A11 = st.number_input("Jarak (A11)", min_value=0, max_value=100, step=1)
 
-    # Membuat tombol untuk memulai prediksi
+    # Button to trigger the inference
     if st.button("🔍 Lakukan Prediksi Manual"):
-        # Mengumpulkan inputan
+        # Collect input data
         sub_aspek_data = [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11]
-        
         try:
-            # Melakukan inference dengan model
             total, predicted_label = model.inference(sub_aspek_data)
             st.subheader(f"Hasil Prediksi: {predicted_label}")
         except Exception as e:

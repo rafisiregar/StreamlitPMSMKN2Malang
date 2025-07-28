@@ -1,4 +1,4 @@
-import streamlit as st #type:ignore
+import streamlit as st  # type: ignore
 import sidebar as sd  
 import pklsmk2
 import home  
@@ -13,7 +13,13 @@ page = sd.render_sidebar()
 if page == "Home":
     home.show() 
 elif page == "PKL Placement":
-    pklsmk2.show()
-    pklsmk2.manual_inference() 
+    # Display PKL Placement page content
+    pklsmk2.show()  
+    
+    # Check if manual_inference() function is properly defined and displayed
+    try:
+        pklsmk2.manual_inference()  # Call manual_inference function here
+    except Exception as e:
+        st.error(f"Error occurred in manual_inference: {e}")
 else:
-    pass  
+    pass
