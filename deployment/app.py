@@ -1,6 +1,6 @@
 import streamlit as st # type:ignore
 import sidebar as sd
-from . import profilematching
+import pm
 import home
 
 # Set page config
@@ -10,6 +10,6 @@ page = sd.render_sidebar()
 if page == "Home":
     home.show()
 elif page == "PKL Placement":
-    profilematching.show()
+    pm.show()
 else:
     pass
