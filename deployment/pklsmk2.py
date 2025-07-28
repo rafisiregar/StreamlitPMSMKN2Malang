@@ -1,90 +1,60 @@
-import streamlit as st  # type: ignore
+import streamlit as st #type:ignore
 import pandas as pd
-import tempfile
-from pklplacementmodel import PKLPlacementModel  # Import model
+from pklplacementmodel import PKLPlacementModel
+import io
 
-# Fungsi untuk membaca file Excel
-def read_excel_file(uploaded_file):
-    try:
-        excel_file = pd.ExcelFile(uploaded_file)
-        return excel_file
-    except Exception as e:
-        st.error(f"Error reading the Excel file: {e}")
-        return None
-
-# Fungsi untuk menampilkan data sheet yang dipilih
-def display_selected_sheet(excel_file):
-    sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
-    df = pd.read_excel(excel_file, sheet_name=sheet_name)
-    
-    # Convert only the first 11 columns to numeric, coercing errors to NaN
-    for column in ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11']:
-        if column in df.columns:
-            df[column] = pd.to_numeric(df[column], errors='coerce')
-    
-    return df, sheet_name
-
-# Fungsi utama untuk menjalankan aplikasi Streamlit
 def show():
-    # Inisialisasi model PKLPlacementModel
+    # Initialize the model
     model = PKLPlacementModel()
 
-    st.title("🔍 Profile Matching for PKL Placement")
+    # Streamlit UI
+    st.title("Profile Matching - PKL Placement")
 
-    uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
+    # Step 1: File upload
+    uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
 
-    if uploaded_file:
-        # Membaca file Excel
-        excel_file = read_excel_file(uploaded_file)
-        
-        if excel_file:
-            st.subheader("📊 Pilih Sheet")
-            # Menampilkan pilihan sheet
-            df, sheet_name = display_selected_sheet(excel_file)
+    if uploaded_file is not None:
+        # Read the Excel file
+        excel_data = pd.ExcelFile(uploaded_file)
 
-            if df is not None:
-                st.subheader("📊 Data yang Diunggah")
-                st.write(f"Data dari sheet: {sheet_name}")
-                st.dataframe(df.head())  # Menampilkan preview dari data yang diupload
+        # Step 2: Display sheets for the user to select
+        sheet_names = excel_data.sheet_names
+        selected_sheet = st.selectbox("Select a sheet", sheet_names)
 
-                # Pastikan data memiliki minimal 11 kolom (A1-A11)
-                if df.shape[1] < 11:
-                    st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
-                    return
+        # Load data from selected sheet
+        df = excel_data.parse(selected_sheet)
 
-                # Pemetaan sub-aspek ke kode A1-A11
-                sub_aspek_mapping = model.map_sub_aspek_to_kode()
+        # Step 3: Display the dataframe
+        st.subheader("Data Preview")
+        st.dataframe(df)
 
-                # Menampilkan pemetaan sub-aspek ke kode
-                st.subheader("Pemetaan Sub-Aspek ke Kode:")
-                st.write(sub_aspek_mapping)
+        # Step 4: Inference button
+        if st.button("🔍 Prediksi!"):
+            # Step 5: Run the inference
+            sub_aspek_data = df.values[0]  # Assumes the first row contains the relevant data for inference
+            total, kategori_terbaik = model.inference(sub_aspek_data)
 
-                # Tombol untuk memulai prediksi
-                if st.button("🔍 Lakukan Prediksi"):
-                    predictions = []  # Menyimpan hasil prediksi untuk setiap baris
-                    for index, row in df.iterrows():
-                        sub_aspek_data = row[:11].values.tolist()  # Mengambil data A1-A11
-                        try:
-                            total, predicted_label = model.inference(sub_aspek_data)
-                            predictions.append(predicted_label)  # Menyimpan label prediksi
-                        except Exception as e:
-                            predictions.append("Error")  # Jika terjadi error, simpan 'Error'
+            # Step 6: Display results
+            st.subheader("Hasil Inference")
+            result_df = pd.DataFrame({
+                "Kategori Terbaik": [kategori_terbaik],
+                "Total Nilai": [total]
+            })
+            st.dataframe(result_df)
 
-                    # Menambahkan hasil prediksi ke dataframe
-                    df['Penempatan PKL'] = predictions
+            # Step 7: Allow the user to download the file with predictions
+            download_file = result_df.copy()
+            download_file["Nama File"] = kategori_terbaik + "_prediction.xlsx"
+            
+            # Save result as an Excel file
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+                download_file.to_excel(writer, index=False, sheet_name="Prediction")
+            output.seek(0)
 
-                    # Menyimpan hasil dataframe ke dalam file Excel sementara
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmpfile:
-                        output_file = tmpfile.name
-                        df.to_excel(output_file, index=False)
-
-                    # Menampilkan tombol download untuk file yang telah diperbarui
-                    st.download_button(
-                        label="Download File dengan Hasil Penempatan",
-                        data=open(output_file, 'rb'),
-                        file_name="updated_pkl_placement_result.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-
-if __name__ == "__main__":
-    show()
+            st.download_button(
+                label="Download Hasil Prediksi",
+                data=output,
+                file_name=f"{kategori_terbaik}_prediction.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
