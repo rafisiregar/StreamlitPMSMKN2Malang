@@ -1,5 +1,5 @@
 import pickle
-import streamlit as st # type:ignore
+import streamlit as st #type:ignore
 import pandas as pd
 import os
 
@@ -7,16 +7,21 @@ import os
 def load_model():
     model_path = os.path.join(os.path.dirname(__file__), "..", "deployment", "pkl_placement_model.pkl")
     try:
+        # Pastikan model pickle dapat dimuat dengan benar
         with open(model_path, "rb") as f:
             model = pickle.load(f)
         st.success("Model berhasil dimuat!")
         return model
     except FileNotFoundError:
-        st.error("File model tidak ditemukan!")
+        st.error(f"File model tidak ditemukan di: {model_path}")
+        return None
+    except AttributeError as e:
+        st.error(f"Terjadi kesalahan: Model tidak dapat dimuat karena masalah atribut: {e}")
         return None
     except Exception as e:
         st.error(f"Terjadi kesalahan saat memuat model: {e}")
         return None
+
 
 # Fungsi untuk membaca file Excel
 def read_excel_file(uploaded_file):
@@ -65,7 +70,12 @@ def show():
 
                 try:
                     # Lakukan prediksi menggunakan model
-                    total, predicted_label = model.inference(sub_aspek_data)
+                    # Pastikan metode inference ada pada model Anda
+                    if hasattr(model, 'inference'):
+                        total, predicted_label = model.inference(sub_aspek_data)
+                    else:
+                        st.error("Model tidak memiliki metode inference yang valid.")
+                        return
 
                     # Output hasil prediksi
                     st.markdown("### 📌 Hasil Prediksi Model")
@@ -84,46 +94,3 @@ def show():
                         st.error("❌ Prediksi tidak sesuai dengan label yang dipilih.")
                 except Exception as e:
                     st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
-
-    # Second inference - Menambahkan hasil penempatan PKL ke file Excel
-    st.markdown("### 2. Menambahkan Hasil Penempatan PKL ke File Excel")
-    st.markdown("Unggah file Excel yang memiliki data sub-aspek, pilih sheet, dan hasil penempatan akan ditambahkan ke kolom baru dalam file yang sama.")
-
-    uploaded_file_2 = st.file_uploader("📤 Upload file data (Excel format) untuk menambah kolom hasil penempatan", type=["xlsx"])
-
-    if uploaded_file_2:
-        df_2 = read_excel_file(uploaded_file_2)
-        if df_2 is not None:
-            st.subheader("📊 Data yang Diunggah")
-            st.dataframe(df_2.head())  # Menampilkan preview data
-
-            if st.button("🔍 Submit & Tambah Hasil Penempatan"):
-                # Validasi data
-                if df_2.shape[1] < 11:
-                    st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
-                    return
-
-                # Prediksi penempatan PKL untuk setiap baris berdasarkan data sub-aspek (A1, A2, ..., A11)
-                results = []
-                for idx, row in df_2.iterrows():
-                    sub_aspek_data = row[:11].values  # Mengambil data dari 11 kolom pertama
-                    sub_aspek_data = sub_aspek_data.tolist()
-                    total, predicted_label = model.inference(sub_aspek_data)
-                    results.append(predicted_label)
-
-                # Menambahkan hasil prediksi sebagai kolom baru
-                df_2['Hasil Penempatan'] = results
-
-                # Menampilkan data yang telah diperbarui
-                st.markdown("### Hasil Data dengan Kolom 'Hasil Penempatan' yang Ditambahkan:")
-                st.dataframe(df_2.head())  # Menampilkan dataframe yang diperbarui
-
-                # Menyimpan dataframe yang sudah diperbarui ke file baru
-                output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
-                df_2.to_excel(output_file, index=False)
-                st.download_button(
-                    label="Download File dengan Hasil Penempatan",
-                    data=open(output_file, 'rb'),
-                    file_name="updated_pkl_placement_result.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
