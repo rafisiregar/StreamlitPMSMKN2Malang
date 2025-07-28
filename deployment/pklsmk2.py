@@ -23,7 +23,7 @@ def show():
     st.title("🔍 Profile Matching for PKL Placement")
 
     # First inference - Profile Matching
-    st.markdown("### 1. Prediksi Penempatan PKL Berdasarkan Data Sub-Aspek")
+    st.markdown("### Prediksi Penempatan PKL")
     st.markdown("Unggah data sub-aspek untuk memprediksi penempatan PKL berdasarkan **Mobile Engineering**, **Software Engineering**, atau **Internet of Things**.")
     
     uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
@@ -34,16 +34,19 @@ def show():
             st.subheader("📊 Data yang Diunggah")
             st.dataframe(df.head())  # Display a preview of the uploaded data
 
+            # Ensure that the data has at least 11 columns (A1-A11)
+            if df.shape[1] < 11:
+                st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
+                return
+
+            # Select actual PKL label
             st.markdown("### 📝 Pilih label sebenarnya (aktual):")
             pkl_labels = ["Mobile Engineering", "Software Engineering", "Internet of Things"]
             selected_label = st.radio("Pilih kategori aktual PKL:", options=pkl_labels)
 
+            # Button to submit and make predictions
             if st.button("🔍 Submit & Prediksi"):
-                # Validate data and run inference
-                if df.shape[1] < 11:
-                    st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
-                    return
-
+                # Reading the first row of data (A1-A11 columns) for inference
                 sub_aspek_data = df.iloc[0, :11].values  # Take data from the first row
                 sub_aspek_data = sub_aspek_data.tolist()
 
@@ -66,51 +69,24 @@ def show():
                         st.success("✅ Prediksi sesuai dengan label yang dipilih.")
                     else:
                         st.error("❌ Prediksi tidak sesuai dengan label yang dipilih.")
+
+                    # Adding prediction result as a new column to the dataframe
+                    df['Penempatan PKL'] = predicted_label
+
+                    # Save the dataframe with the new prediction column to a new file
+                    output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
+                    df.to_excel(output_file, index=False)
+
+                    # Provide download button for the updated file
+                    st.download_button(
+                        label="Download File dengan Hasil Penempatan",
+                        data=open(output_file, 'rb'),
+                        file_name="updated_pkl_placement_result.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+
                 except Exception as e:
                     st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
-
-    # Second inference - Add PKL placement results to the Excel file
-    st.markdown("### 2. Menambahkan Hasil Penempatan PKL ke File Excel")
-    st.markdown("Unggah file Excel yang memiliki data sub-aspek, pilih sheet, dan hasil penempatan akan ditambahkan ke kolom baru dalam file yang sama.")
-
-    uploaded_file_2 = st.file_uploader("📤 Upload file data (Excel format) untuk menambah kolom hasil penempatan", type=["xlsx"])
-
-    if uploaded_file_2:
-        df_2 = read_excel_file(uploaded_file_2)
-        if df_2 is not None:
-            st.subheader("📊 Data yang Diunggah")
-            st.dataframe(df_2.head())  # Display a preview of the uploaded data
-
-            if st.button("🔍 Submit & Tambah Hasil Penempatan"):
-                # Validate data
-                if df_2.shape[1] < 11:
-                    st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
-                    return
-
-                # Predict PKL placement for each row based on sub-aspect data (A1, A2, ..., A11)
-                results = []
-                for idx, row in df_2.iterrows():
-                    sub_aspek_data = row[:11].values  # Take data from the first 11 columns
-                    sub_aspek_data = sub_aspek_data.tolist()
-                    total, predicted_label = model.inference(sub_aspek_data)
-                    results.append(predicted_label)
-
-                # Add prediction results as a new column
-                df_2['Hasil Penempatan'] = results
-
-                # Display the updated data
-                st.markdown("### Hasil Data dengan Kolom 'Hasil Penempatan' yang Ditambahkan:")
-                st.dataframe(df_2.head())  # Display the updated dataframe
-
-                # Save the updated dataframe to a new file
-                output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
-                df_2.to_excel(output_file, index=False)
-                st.download_button(
-                    label="Download File dengan Hasil Penempatan",
-                    data=open(output_file, 'rb'),
-                    file_name="updated_pkl_placement_result.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
 
 if __name__ == "__main__":
     show()
