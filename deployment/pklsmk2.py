@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st  # type: ignore
 import pandas as pd
 import tempfile
 from pklplacementmodel import PKLPlacementModel  # Import model
@@ -33,19 +33,20 @@ def show():
     except Exception as e:
         st.error(f"Terjadi kesalahan saat melakukan inferensi manual: {e}")
 
-    # Form untuk input manual sub-aspek A1-A11
-    st.subheader("🔢 Masukkan Nilai Sub-Aspek A1-A11 Secara Manual")
-
     # Input manual untuk setiap sub-aspek (A1-A11)
-    sub_aspek_manual = []
+    st.subheader("🔢 Masukkan Nilai Sub-Aspek Secara Manual")
+    
+    # Input untuk A1 hingga A11
+    sub_aspek_input_manual = []
     for i in range(1, 12):
         value = st.number_input(f"Nilai A{i}", min_value=0, max_value=100, value=80, step=1)
-        sub_aspek_manual.append(value)
+        sub_aspek_input_manual.append(value)
 
     # Tombol untuk melakukan prediksi dengan input manual
     if st.button("🔍 Lakukan Prediksi dengan Input Manual"):
         try:
-            total, predicted_label = model.inference(sub_aspek_manual)  # Melakukan inferensi
+            # Melakukan inferensi menggunakan model
+            total, predicted_label = model.inference(sub_aspek_input_manual)
             st.subheader("Hasil Prediksi dari Input Manual")
             st.write(f"Nilai Total: {total}")
             st.write(f"Penempatan PKL terbaik: {predicted_label}")
