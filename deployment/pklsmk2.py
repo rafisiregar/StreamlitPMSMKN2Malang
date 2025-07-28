@@ -1,12 +1,12 @@
-import streamlit as st  # type:ignore
+import streamlit as st #type:ignore
+import pandas as pd
 import openpyxl
-import pandas as pd  # Make sure pandas is imported
-from pklplacementmodel import PKLPlacementModel  # Import the model class from pklplacementmodel.py
+from pklplacementmodel import PKLPlacementModel  # pastikan model ini sudah ada
 
-# Main function to run the Streamlit app
+# Fungsi utama untuk menjalankan aplikasi Streamlit
 def show():
-
-    # Function to read Excel files
+    
+    # Fungsi untuk membaca file Excel
     def read_excel_file(uploaded_file):
         try:
             excel_file = pd.ExcelFile(uploaded_file)
@@ -17,78 +17,61 @@ def show():
             st.error(f"Error reading the Excel file: {e}")
             return None
 
-    # Function to clean and validate data
+    # Fungsi untuk membersihkan dan memvalidasi data
     def clean_data(df):
-        # Convert the first 11 columns to numeric, coercing errors (non-numeric values will become NaN)
-        df_cleaned = df.iloc[:, :11].apply(pd.to_numeric, errors='coerce')
-        
-        # Check if there are any NaN values after conversion
+        df_cleaned = df.iloc[:, :11].apply(pd.to_numeric, errors='coerce')  # Mengubah kolom A1-A11 ke numerik
         if df_cleaned.isnull().values.any():
-            st.warning("Beberapa nilai dalam data tidak valid (misalnya kosong atau teks). Nilai tersebut akan diperlakukan sebagai NaN.")
-            # Handle missing data (NaN), either fill with default value (like 0 or mean) or drop the rows
-            df_cleaned = df_cleaned.fillna(0)  # Or use df_cleaned.dropna() to remove rows with NaN
+            st.warning("Beberapa nilai dalam data tidak valid. Nilai tersebut akan diperlakukan sebagai NaN.")
+            df_cleaned = df_cleaned.fillna(0)  # Mengisi NaN dengan 0
         return df_cleaned
 
-    # Instantiate the model once when the app starts
-    model = PKLPlacementModel()  # Instantiate the PKLPlacementModel
+    # Instansiasi model
+    model = PKLPlacementModel()  # Pastikan model ini sudah ada dan dapat diimpor
 
     st.title("🔍 Profile Matching for PKL Placement")
 
-    # First inference - Profile Matching
-    st.markdown("### Prediksi Penempatan PKL")
-    st.markdown("Unggah data sub-aspek untuk memprediksi penempatan PKL berdasarkan **Mobile Engineering**, **Software Engineering**, atau **Internet of Things**.")
-    
+    # Proses upload dan inferensi
     uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
 
     if uploaded_file:
         df = read_excel_file(uploaded_file)
         if df is not None:
             st.subheader("📊 Data yang Diunggah")
-            st.dataframe(df.head())  # Display a preview of the uploaded data
+            st.dataframe(df.head())  # Menampilkan preview dari data yang diupload
 
-            # Ensure that the data has at least 11 columns (A1-A11)
+            # Pastikan data memiliki minimal 11 kolom (A1-A11)
             if df.shape[1] < 11:
                 st.error("Data tidak lengkap! Harap unggah data dengan minimal 11 kolom sub-aspek.")
                 return
 
-            # Clean the data by converting to numeric and handling missing values
+            # Membersihkan data
             df_cleaned = clean_data(df)
 
-            # Select actual PKL label
-            st.markdown("### 📝 Pilih label sebenarnya (aktual):")
-            pkl_labels = ["Mobile Engineering", "Software Engineering", "Internet of Things"]
-            selected_label = st.radio("Pilih kategori aktual PKL:", options=pkl_labels)
+            # Melakukan prediksi untuk setiap baris data
+            st.markdown("### 📝 Melakukan Prediksi untuk setiap baris data")
+            predictions = []  # Menyimpan hasil prediksi untuk setiap baris
+            for index, row in df_cleaned.iterrows():
+                sub_aspek_data = row[:11].values.tolist()  # Mengambil data A1-A11
+                try:
+                    total, predicted_label = model.inference(sub_aspek_data)
+                    predictions.append(predicted_label)  # Menyimpan label prediksi
+                except Exception as e:
+                    predictions.append("Error")  # Jika terjadi error, simpan 'Error'
 
-            # Button to submit and make predictions
-            if st.button("🔍 Submit & Prediksi"):
-                # Perform prediction for each row and add it to a new column
-                predicted_labels = []
-                for idx, row in df_cleaned.iterrows():
-                    sub_aspek_data = row.values  # Get all 11 values for the row
-                    sub_aspek_data = sub_aspek_data.tolist()
+            # Menambahkan hasil prediksi ke dataframe
+            df['Penempatan PKL'] = predictions
 
-                    try:
-                        # Perform prediction using the model
-                        total, predicted_label = model.inference(sub_aspek_data)
-                        predicted_labels.append(predicted_label)
-                    except Exception as e:
-                        st.error(f"Terjadi kesalahan saat melakukan prediksi untuk baris {idx}: {e}")
-                        predicted_labels.append("Error")  # Add error if prediction fails for any row
+            # Menyimpan hasil dataframe ke dalam file Excel
+            output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
+            df.to_excel(output_file, index=False)
 
-                # Add the predicted labels as a new column to the dataframe
-                df['Penempatan PKL'] = predicted_labels
-
-                # Save the dataframe with the new prediction column to a new file
-                output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
-                df.to_excel(output_file, index=False)
-
-                # Provide download button for the updated file
-                st.download_button(
-                    label="Download File dengan Hasil Penempatan",
-                    data=open(output_file, 'rb'),
-                    file_name="updated_pkl_placement_result.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+            # Menampilkan tombol download untuk file yang telah diperbarui
+            st.download_button(
+                label="Download File dengan Hasil Penempatan",
+                data=open(output_file, 'rb'),
+                file_name="updated_pkl_placement_result.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
 if __name__ == "__main__":
     show()
