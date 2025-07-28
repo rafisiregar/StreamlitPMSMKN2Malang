@@ -61,47 +61,34 @@ def show():
 
             # Button to submit and make predictions
             if st.button("🔍 Submit & Prediksi"):
-                # Reading the first row of cleaned data (A1-A11 columns) for inference
-                sub_aspek_data = df_cleaned.iloc[0, :11].values  # Take data from the first row
-                sub_aspek_data = sub_aspek_data.tolist()
+                # Perform prediction for each row and add it to a new column
+                predicted_labels = []
+                for idx, row in df_cleaned.iterrows():
+                    sub_aspek_data = row.values  # Get all 11 values for the row
+                    sub_aspek_data = sub_aspek_data.tolist()
 
-                try:
-                    # Perform prediction using the model
-                    total, predicted_label = model.inference(sub_aspek_data)
+                    try:
+                        # Perform prediction using the model
+                        total, predicted_label = model.inference(sub_aspek_data)
+                        predicted_labels.append(predicted_label)
+                    except Exception as e:
+                        st.error(f"Terjadi kesalahan saat melakukan prediksi untuk baris {idx}: {e}")
+                        predicted_labels.append("Error")  # Add error if prediction fails for any row
 
-                    # Display prediction result
-                    st.markdown("### 📌 Hasil Prediksi Model")
-                    st.success(f"**Penempatan PKL yang Direkomendasikan:** {predicted_label}")
-                    st.info(f"**Nilai Total Prediksi:** {total:.2f}")
+                # Add the predicted labels as a new column to the dataframe
+                df['Penempatan PKL'] = predicted_labels
 
-                    # Display the actual label (Ground truth)
-                    st.markdown("---")
-                    st.markdown("### ✅ Hasil Aktual Data")
-                    st.success(f"**Penempatan PKL Sebenarnya:** {selected_label}")
+                # Save the dataframe with the new prediction column to a new file
+                output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
+                df.to_excel(output_file, index=False)
 
-                    # Compare predicted label with actual label
-                    if predicted_label.lower() == selected_label.lower():
-                        st.success("✅ Prediksi sesuai dengan label yang dipilih.")
-                    else:
-                        st.error("❌ Prediksi tidak sesuai dengan label yang dipilih.")
-
-                    # Adding prediction result as a new column to the dataframe
-                    df['Penempatan PKL'] = predicted_label
-
-                    # Save the dataframe with the new prediction column to a new file
-                    output_file = "/mnt/data/updated_pkl_placement_result.xlsx"
-                    df.to_excel(output_file, index=False)
-
-                    # Provide download button for the updated file
-                    st.download_button(
-                        label="Download File dengan Hasil Penempatan",
-                        data=open(output_file, 'rb'),
-                        file_name="updated_pkl_placement_result.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-
-                except Exception as e:
-                    st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
+                # Provide download button for the updated file
+                st.download_button(
+                    label="Download File dengan Hasil Penempatan",
+                    data=open(output_file, 'rb'),
+                    file_name="updated_pkl_placement_result.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
 
 if __name__ == "__main__":
     show()
