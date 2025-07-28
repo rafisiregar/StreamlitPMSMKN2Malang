@@ -1,39 +1,39 @@
 import pickle
-import streamlit as st #type:ignore
+import streamlit as st  # type:ignore
 import pandas as pd  # Pastikan pandas diimpor
 import os
 
-# Fungsi untuk memuat model pickle
-def load_model():
-    model_path = os.path.join(os.path.dirname(__file__), "..", "deployment", "pkl_placement_model.pkl")
-    try:
-        with open(model_path, "rb") as f:
-            model = pickle.load(f)  # Memuat model
-        st.success("Model berhasil dimuat!")
-        return model
-    except FileNotFoundError:
-        st.error("File model tidak ditemukan!")
-        return None
-    except AttributeError as e:
-        st.error(f"Terjadi kesalahan: Model tidak dapat dimuat karena masalah atribut: {e}")
-        return None
-    except Exception as e:
-        st.error(f"Terjadi kesalahan saat memuat model: {e}")
-        return None
-
-# Fungsi untuk membaca file Excel
-def read_excel_file(uploaded_file):
-    try:
-        excel_file = pd.ExcelFile(uploaded_file)
-        sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
-        df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
-        return df
-    except Exception as e:
-        st.error(f"Error reading the Excel file: {e}")
-        return None
-
-# Fungsi untuk menjalankan antarmuka Streamlit
+# Fungsi utama untuk menjalankan aplikasi Streamlit
 def show():
+    # Fungsi untuk memuat model pickle
+    def load_model():
+        model_path = os.path.join(os.path.dirname(__file__), "..", "deployment", "pkl_placement_model.pkl")
+        try:
+            with open(model_path, "rb") as f:
+                model = pickle.load(f)  # Memuat model
+            st.success("Model berhasil dimuat!")
+            return model
+        except FileNotFoundError:
+            st.error("File model tidak ditemukan!")
+            return None
+        except AttributeError as e:
+            st.error(f"Terjadi kesalahan: Model tidak dapat dimuat karena masalah atribut: {e}")
+            return None
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat memuat model: {e}")
+            return None
+
+    # Fungsi untuk membaca file Excel
+    def read_excel_file(uploaded_file):
+        try:
+            excel_file = pd.ExcelFile(uploaded_file)
+            sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
+            df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
+            return df
+        except Exception as e:
+            st.error(f"Error reading the Excel file: {e}")
+            return None
+
     # Memuat model hanya sekali saat aplikasi dijalankan
     model = load_model()
     if model is None:
@@ -134,4 +134,7 @@ def show():
                     data=open(output_file, 'rb'),
                     file_name="updated_pkl_placement_result.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+                )  
+
+if __name__ == "__main__":
+    show()
