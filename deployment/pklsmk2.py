@@ -1,4 +1,4 @@
-import streamlit as st  # type:ignore
+import streamlit as st #type: ignore
 import pandas as pd
 import tempfile
 from pklplacementmodel import PKLPlacementModel  # Import model
@@ -25,13 +25,14 @@ def show():
 
     # Menambahkan contoh input data untuk inferensi manual
     sub_aspek_input = [90, 85, 88, 76, 89, 90, 92, 80, 85, 87, 6]  # Contoh input
-    total, predicted_label = model.inference(sub_aspek_input)  # Proses inferensi manual
+    try:
+        total, predicted_label = model.inference(sub_aspek_input)  # Proses inferensi manual
+        st.subheader("Hasil Inferensi Manual")
+        st.write(f"Nilai Total: {total}")
+        st.write(f"Penempatan PKL terbaik: {predicted_label}")
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat melakukan inferensi manual: {e}")
 
-    st.subheader("Hasil Inferensi Manual")
-    st.write(f"Nilai Total: {total}")
-    st.write(f"Penempatan PKL terbaik: {predicted_label}")
-
-    # Lanjutkan dengan bagian untuk upload file dan prediksi seperti biasa
     if uploaded_file:
         df = read_excel_file(uploaded_file)
         if df is not None:
@@ -59,6 +60,7 @@ def show():
                         total, predicted_label = model.inference(sub_aspek_data)
                         predictions.append(predicted_label)  # Menyimpan label prediksi
                     except Exception as e:
+                        st.error(f"Terjadi kesalahan pada baris {index + 1}: {e}")
                         predictions.append("Error")  # Jika terjadi error, simpan 'Error'
 
                 # Menambahkan hasil prediksi ke dataframe
@@ -67,7 +69,11 @@ def show():
                 # Menyimpan hasil dataframe ke dalam file Excel sementara
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmpfile:
                     output_file = tmpfile.name
-                    df.to_excel(output_file, index=False)
+                    try:
+                        df.to_excel(output_file, index=False)
+                        st.success("File berhasil disimpan!")
+                    except Exception as e:
+                        st.error(f"Terjadi kesalahan saat menyimpan file Excel: {e}")
 
                 # Menampilkan tombol download untuk file yang telah diperbarui
                 st.download_button(
