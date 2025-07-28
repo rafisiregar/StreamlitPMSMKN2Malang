@@ -5,6 +5,18 @@ import pandas as pd
 import pickle
 import os
 from pklsmk2 import PKLPlacementModel  # Mengimpor kelas di sini
+import pickle
+
+# Membuat model (seperti yang Anda lakukan di notebook)
+model = PKLPlacementModel()
+
+# Simpan model ke file pickle
+with open('pkl_placement_model.pkl', 'wb') as file:
+    pickle.dump(model, file)
+
+# Memuat model
+with open('pkl_placement_model.pkl', 'rb') as file:
+    loaded_model = pickle.load(file)
 
 # Streamlit UI
 def show():
