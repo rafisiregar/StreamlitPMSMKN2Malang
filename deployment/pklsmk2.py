@@ -1,4 +1,4 @@
-import streamlit as st #type:ignore
+import streamlit as st  # type: ignore
 import pandas as pd
 import tempfile
 from pklplacementmodel import PKLPlacementModel  # Import model
@@ -9,14 +9,15 @@ def read_excel_file(uploaded_file):
         excel_file = pd.ExcelFile(uploaded_file)
         sheet_name = st.selectbox("Pilih sheet", excel_file.sheet_names)
         df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
-    
+        
+        # Convert only the first 11 columns to numeric, coercing errors to NaN
         df.iloc[:, :11] = df.iloc[:, :11].apply(pd.to_numeric, errors='coerce')
 
-        return df
+        return df, sheet_name
     
     except Exception as e:
         st.error(f"Error reading the Excel file: {e}")
-        return None
+        return None, None
 
 # Fungsi utama untuk menjalankan aplikasi Streamlit
 def show():
@@ -28,9 +29,11 @@ def show():
     uploaded_file = st.file_uploader("📤 Upload file data (Excel format)", type=["xlsx"])
 
     if uploaded_file:
-        df = read_excel_file(uploaded_file)
+        # Read the file and allow sheet selection
+        df, sheet_name = read_excel_file(uploaded_file)
         if df is not None:
             st.subheader("📊 Data yang Diunggah")
+            st.write(f"Data dari sheet: {sheet_name}")
             st.dataframe(df.head())  # Menampilkan preview dari data yang diupload
 
             # Pastikan data memiliki minimal 11 kolom (A1-A11)
