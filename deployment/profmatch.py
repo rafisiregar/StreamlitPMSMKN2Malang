@@ -59,17 +59,15 @@ Please read the instructions in the Home page before proceeding!
                 # Run the inference
                 total, kategori_terbaik = model.inference(sub_aspek_data)
 
-                # Ambil nama kolom dari nilai pada baris A, B, dan N
-                nisn = row.iloc[0]  # Kolom A (indeks 0)
-                nama_lengkap = row.iloc[1]  # Kolom B (indeks 1)
-                jurusan = row.iloc[13]  # Kolom N (indeks 13) (Kolom N adalah kolom ke-14 karena indeks mulai dari 0)
-
+                nisn = row[df.columns[0]]  # Kolom A (indeks 0)
+                nama_lengkap = row[df.columns[1]]  # Kolom B (indeks 1)
+                kelas = row[df.columns[13]]  # Kolom N (indeks 13)
 
                 # Prepare the result for this row
                 predictions = {
-                    row.iloc[0]: nisn,  # Dinamis, menggunakan nilai di row[0] sebagai nama kolom
-                    row.iloc[1]: nama_lengkap,  # Dinamis, menggunakan nilai di row[1] sebagai nama kolom
-                    row.iloc[13]: jurusan,  # Dinamis, menggunakan nilai di row[13] sebagai nama kolom
+                    df.columns[0]: nisn,  # Dinamis, menggunakan nama kolom dari df.columns[0] sebagai kunci
+                    df.columns[1]: nama_lengkap,  # Dinamis, menggunakan nama kolom dari df.columns[1] sebagai kunci
+                    df.columns[13]: kelas,  # Dinamis, menggunakan nama kolom dari df.columns[13] sebagai kunci
                     "Kategori Terbaik": kategori_terbaik,
                     "Total Nilai": total
                 }
