@@ -61,12 +61,12 @@ Please read the instructions in the Home page before proceeding!
 
                 # Append the result for this row
                 predictions.append({
-                    "NISN": row["NISN"],
-                    "Nama Lengkap": row["Nama Lengkap"],
-                    "Jurusan": row["Jurusan"],
                     "Kategori Terbaik": kategori_terbaik,
                     "Total Nilai": total
                 })
+
+            df["Kategori Terbaik"] = predictions["Kategori Terbaik"]
+            df["Total Nilai"] = predictions["Total Nilai"]
 
             # Step 7: Convert the predictions list into a dataframe
             result_df = pd.DataFrame(predictions)
