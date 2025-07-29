@@ -97,7 +97,7 @@ If you need the template to ensure your data is properly formatted, you can down
         "A9": [88, 75, 90, 85, 80],  # Added values for Web Programming (A9)
         "A10": [92, 80, 85, 90, 82],  # Added values for Internet of Things (A10)
         "A11": [4.4, 3, 2.5, 7.7, 3.9],
-        "Major": ["TKJ 1", "TKJ 2", "TKJ 3", "TKJ 1", "TKJ 2"]
+        "Class": ["TKJ 1", "TKJ 2", "TKJ 3", "TKJ 1", "TKJ 2"]
     }
     df = pd.DataFrame(data)
     st.dataframe(df)
