@@ -81,7 +81,7 @@ If you'd like to run the application on your local machine:
    ```
 3. Run the Streamlit application:
    ```bash
-   streamlit run app.py
+   streamlit run deployment/app.py
    ```
 4. The app will be accessible locally via the URL provided by Streamlit, where you can interact with it.
 
