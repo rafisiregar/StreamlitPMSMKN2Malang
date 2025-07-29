@@ -58,8 +58,8 @@ Once your data is uploaded, the algorithm will use this information to predict t
 
     # Section: Dataset and Distribution
     st.markdown("""
-### 📁 Dataset Requirements
-
+### 📁 Dataset Requirements <a id="dataset-requirements"></a>
+                
 This model is trained using a dataset that includes student data from SMK, covering their report card results and types of PKL placements.
 
 **Important**: Please ensure that the dataset you upload meets the following requirements, as it is crucial for accurate PKL placement predictions. You can download the dataset template below to help guide your data formatting.
@@ -73,8 +73,9 @@ This model is trained using a dataset that includes student data from SMK, cover
 - The dataset should include student names, grades for each subject (A1 to A11), and their major (Jurusan).
 - Data should be in tabular format, as shown in the example below.
 
-If you need the template to ensure your data is properly formatted, you can download it by clicking the button below.
+🚨 **Attention**: The dataset **must** be in **.xlsx** format for proper processing! Please make sure to upload an **Excel file (.xlsx)** and **NOT** a CSV or any other file type! 🚨
 
+If you need the template to ensure your data is properly formatted, you can download it by clicking the button below.
 """)
     
     # Create and display dummy dataset

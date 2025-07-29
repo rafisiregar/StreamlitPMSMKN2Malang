@@ -13,6 +13,10 @@ def show():
     # Streamlit UI
     st.title("Profile Matching - PKL Placement")
 
+    st.markdown("""
+Please read the instructions here before proceeding: [**Home - Dataset Requirements**](#dataset-requirements) 📋
+""")
+    
     # Step 1: File upload
     uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
 
