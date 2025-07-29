@@ -43,6 +43,7 @@ Please read the instructions in the Home page before proceeding!
         
         # Step 5: Inference button
         if st.button("🔍 Prediksi!"):
+            predictions = []
 
             # Step 6: Loop through all rows in the dataframe
             for index, row in df.iterrows():
@@ -59,17 +60,18 @@ Please read the instructions in the Home page before proceeding!
                 total, kategori_terbaik = model.inference(sub_aspek_data)
 
                 # Append the result for this row
-                # Prepare the result for this row
-            result = {
-                "Kategori Terbaik": kategori_terbaik,
-                "Total Nilai": total
-            }
-            
-            # Append the result as a new row to the original dataframe
-            df = df.append(result, ignore_index=True)
+                predictions.append({
+                    
+                    "Kategori Terbaik": kategori_terbaik,
+                    "Total Nilai": total
+                })
+            predictions_df = pd.DataFrame(predictions)
+
+            df["Kategori Terbaik"] = predictions_df["Kategori Terbaik"]
+            df["Total Nilai"] = predictions_df["Total Nilai"]
 
             # Step 7: Convert the predictions list into a dataframe
-            result_df = pd.DataFrame(df)
+            result_df = pd.DataFrame(predictions)
 
             # Step 8: Display results
             st.subheader("Prediction Results")
