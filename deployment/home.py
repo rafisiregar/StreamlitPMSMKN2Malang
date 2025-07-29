@@ -77,6 +77,7 @@ If you need the template to ensure your data is properly formatted, you can down
 """)
     
     # Create and display dummy dataset
+    # Define the dataset
     data = {
         "NIS": [17045, 17046, 17047, 17048, 17049],
         "Full Name": [
@@ -99,9 +100,14 @@ If you need the template to ensure your data is properly formatted, you can down
         "A11": [4.4, 3, 2.5, 7.7, 3.9],
         "Class": ["TKJ 1", "TKJ 2", "TKJ 3", "TKJ 1", "TKJ 2"]
     }
+
+    # Create DataFrame
     df = pd.DataFrame(data)
+
+    # Display the dataframe in the Streamlit app
     st.dataframe(df)
-    # Convert dataframe to an Excel file
+
+    # Convert the DataFrame to an Excel file
     excel_file = io.BytesIO()
     with pd.ExcelWriter(excel_file, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False, sheet_name="Student Data")
