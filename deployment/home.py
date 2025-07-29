@@ -1,3 +1,4 @@
+import io
 import streamlit as st  # type:ignore
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -56,15 +57,23 @@ Once your data is uploaded, the algorithm will use this information to predict t
 
     # Section: Dataset and Distribution
     st.markdown("""
-### 📁 Dataset Used
+### 📁 Dataset Requirements
 
 This model is trained using a dataset that includes student data from SMK, covering their report card results and types of PKL placements.
 
-- **Original Dataset** comes from internal processing, including the following data:
-  - **Student report card results** across various fields of study
-  - **PKL placements** across categories such as *Mobile Engineering*, *Software Engineering*, and *Internet of Things*
+**Important**: Please ensure that the dataset you upload meets the following requirements, as it is crucial for accurate PKL placement predictions. You can download the dataset template below to help guide your data formatting.
 
-**Here are the example of data used for predicting PKL Placement:**
+**Original Dataset** comes from internal processing, including the following data:
+  - **Student report card results** across various fields of study.
+  - **PKL placements** across categories such as *Mobile Engineering*, *Software Engineering*, and *Internet of Things*.
+
+**Here are the example data requirements for predicting PKL Placement:**
+
+- The dataset should include student names, grades for each subject (A1 to A11), and their major (Jurusan).
+- Data should be in tabular format, as shown in the example below.
+
+If you need the template to ensure your data is properly formatted, you can download it by clicking the button below.
+
 """)
     
     # Create and display dummy dataset
@@ -92,6 +101,20 @@ This model is trained using a dataset that includes student data from SMK, cover
     }
     df = pd.DataFrame(data)
     st.dataframe(df)
+    # Convert dataframe to an Excel file
+    excel_file = io.BytesIO()
+    with pd.ExcelWriter(excel_file, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="Student Data")
+        writer.save()
+    excel_file.seek(0)
+
+    # Provide a download button for the Excel file
+    st.download_button(
+        label="Download Dataset as Excel",
+        data=excel_file,
+        file_name="student_data.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
     st.markdown("---")
 
