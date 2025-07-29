@@ -29,6 +29,11 @@ def show():
     A10 = st.number_input("Internet of Things (A10)", min_value=0.0, max_value=100.0, step=0.1, help="Score for IoT Technologies subject")
     A11 = st.number_input("Jarak (A11)", min_value=0.0, max_value=100.0, step=0.1, help="Score for Distance (specific to program)")
 
+    # Allow null by using `None` if no input is provided
+    A8 = None if A8 == 0.0 else A8
+    A9 = None if A9 == 0.0 else A9
+    A10 = None if A10 == 0.0 else A10
+    
     # Store the inputs in a list
     sub_aspek_data = [A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11]
 
