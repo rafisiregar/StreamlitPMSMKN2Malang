@@ -60,17 +60,13 @@ Please read the instructions in the Home page before proceeding!
                 total, kategori_terbaik = model.inference(sub_aspek_data)
 
                 # Append the result for this row
-                predictions.append({
+                df.append({
                     "Kategori Terbaik": kategori_terbaik,
                     "Total Nilai": total
                 })
-            predictions_df = pd.DataFrame(predictions)
-
-            df["Kategori Terbaik"] = predictions_df["Kategori Terbaik"]
-            df["Total Nilai"] = predictions_df["Total Nilai"]
 
             # Step 7: Convert the predictions list into a dataframe
-            result_df = pd.DataFrame(predictions)
+            result_df = pd.DataFrame(df)
 
             # Step 8: Display results
             st.subheader("Prediction Results")
