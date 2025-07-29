@@ -3,7 +3,7 @@ import pandas as pd
 from pklplacementmodel import PKLPlacementModel
 import io
 import matplotlib.pyplot as plt
-import plotly.express as px  # type:ignore
+import plotly.express as px  
 
 def show():
 
