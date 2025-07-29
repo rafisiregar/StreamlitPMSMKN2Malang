@@ -110,7 +110,6 @@ If you need the template to ensure your data is properly formatted, you can down
     excel_file = io.BytesIO()
     with pd.ExcelWriter(excel_file, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False, sheet_name="Student Data")
-        writer.save()
     excel_file.seek(0)
 
     # Provide a download button for the Excel file
