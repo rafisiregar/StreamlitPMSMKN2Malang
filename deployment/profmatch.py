@@ -59,16 +59,19 @@ Please read the instructions in the Home page before proceeding!
                 # Run the inference
                 total, kategori_terbaik = model.inference(sub_aspek_data)
 
-                # Append the result for this row
-                predictions.append({
-                    
+                # Ambil nama kolom dari nilai pada baris A, B, dan N
+                nisn = row[row["A"]]  # Ambil nilai dari kolom yang ditunjuk oleh nilai pada row["A"]
+                nama_lengkap = row[row["B"]]  # Ambil nilai dari kolom yang ditunjuk oleh nilai pada row["B"]
+                jurusan = row[row["N"]]  # Ambil nilai dari kolom yang ditunjuk oleh nilai pada row["N"]
+
+                # Prepare the result for this row
+                predictions = {
+                    row["A"]: nisn,  # Dinamis, menggunakan nilai dari row["A"] sebagai nama kolom
+                    row["B"]: nama_lengkap,  # Dinamis, menggunakan nilai dari row["B"] sebagai nama kolom
+                    row["N"]: jurusan,  # Dinamis, menggunakan nilai dari row["N"] sebagai nama kolom
                     "Kategori Terbaik": kategori_terbaik,
                     "Total Nilai": total
-                })
-            predictions_df = pd.DataFrame(predictions)
-
-            df["Kategori Terbaik"] = predictions_df["Kategori Terbaik"]
-            df["Total Nilai"] = predictions_df["Total Nilai"]
+                }
 
             # Step 7: Convert the predictions list into a dataframe
             result_df = pd.DataFrame(predictions)
