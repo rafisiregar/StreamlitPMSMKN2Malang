@@ -2,6 +2,7 @@ import io
 import streamlit as st  # type:ignore
 import matplotlib.pyplot as plt
 import pandas as pd
+import xlsxwriter
 
 def show():
     # Title of the Dashboard
