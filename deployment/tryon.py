@@ -39,8 +39,8 @@ def show():
 
     # Step 2: Inference button
     if st.button("🔍 Get Recommendation!"):
-    # Ensure that no value is None and that all values are provided (greater than 0)
-        if all(value is not None and value > 0 for value in sub_aspek_data):  
+    # Check if A8, A9, A10 can be null but other fields must have a value greater than 0
+        if all((value is not None and value > 0) for i, value in enumerate(sub_aspek_data) if i not in [7, 8, 9]):  
             try:
                 # Run inference using the model
                 total, kategori_terbaik = model.inference(sub_aspek_data)
@@ -53,7 +53,7 @@ def show():
             except Exception as e:
                 st.error(f"Error during prediction: {e}")
         else:
-            st.error("Please fill in all the input fields before submitting. All values must be provided and greater than 0.")
+            st.error("Please fill in all the input fields before submitting. All values must be provided and greater than 0, except for A8, A9, and A10.")
 
 if __name__ == "__main__":
     show()
