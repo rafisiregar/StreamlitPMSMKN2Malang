@@ -14,7 +14,7 @@ def render_sidebar():
     st.sidebar.markdown("---")
     
     st.sidebar.markdown("### 🧭 Navigation")
-    selected = st.sidebar.radio("Select page:", ["Home", "PKL Placement"])
+    selected = st.sidebar.radio("Select page:", ["Home", "PKL Placement", "Try On!"])
     
     st.sidebar.markdown("---")
     st.sidebar.markdown("Made by Rafi Arya Siregar")
