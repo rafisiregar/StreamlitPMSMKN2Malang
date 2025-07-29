@@ -64,9 +64,10 @@ Please read the instructions in the Home page before proceeding!
                     "Kategori Terbaik": kategori_terbaik,
                     "Total Nilai": total
                 })
+            predictions_df = pd.DataFrame(predictions)
 
-            df["Kategori Terbaik"] = predictions["Kategori Terbaik"]
-            df["Total Nilai"] = predictions["Total Nilai"]
+            df["Kategori Terbaik"] = predictions_df["Kategori Terbaik"]
+            df["Total Nilai"] = predictions_df["Total Nilai"]
 
             # Step 7: Convert the predictions list into a dataframe
             result_df = pd.DataFrame(predictions)
