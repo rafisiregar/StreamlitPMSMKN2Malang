@@ -59,7 +59,8 @@ Once your data is uploaded, the algorithm will use this information to predict t
     # Section: Dataset and Distribution
     st.markdown("""
 ### 📁 Dataset Requirements <a id="dataset-requirements"></a>
-                
+            
+    
 This model is trained using a dataset that includes student data from SMK, covering their report card results and types of PKL placements.
 
 **Important**: Please ensure that the dataset you upload meets the following requirements, as it is crucial for accurate PKL placement predictions. You can download the dataset template below to help guide your data formatting.

@@ -14,7 +14,7 @@ def show():
     st.title("Profile Matching - PKL Placement")
 
     st.markdown("""
-Please read the instructions here before proceeding: [**Home - Dataset Requirements**](#dataset-requirements) 📋
+Please read the instructions [***here***](#dataset-requirements) before proceeding!
 """)
     
     # Step 1: File upload
