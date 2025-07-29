@@ -61,7 +61,7 @@ Please read the instructions in the Home page before proceeding!
 
                 # Append the result for this row
                 predictions.append({
-                    "No Absen": row["No Absen"],
+                    "NISN": row["NISN"],
                     "Nama Lengkap": row["Nama Lengkap"],
                     "Jurusan": row["Jurusan"],
                     "Kategori Terbaik": kategori_terbaik,
