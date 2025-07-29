@@ -60,13 +60,15 @@ Please read the instructions in the Home page before proceeding!
                 total, kategori_terbaik = model.inference(sub_aspek_data)
 
                 # Prepare the result for this row
-                predictions = {
+                prediction = {
                     df.columns[0]: row[df.columns[0]],  # Mengambil nilai dari kolom pertama (misal: NISN)
                     df.columns[1]: row[df.columns[1]],  # Mengambil nilai dari kolom kedua (misal: Nama Lengkap)
                     df.columns[13]: row[df.columns[13]],  # Mengambil nilai dari kolom ke-14 (misal: Jurusan)
                     "Kategori Terbaik": kategori_terbaik,
                     "Total Nilai": total
                 }
+
+                predictions.append(prediction)
 
             # Step 7: Convert the predictions list into a dataframe
             result_df = pd.DataFrame(predictions)
