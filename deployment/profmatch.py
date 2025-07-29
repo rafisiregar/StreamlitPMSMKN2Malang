@@ -122,20 +122,20 @@ Please read the instructions in the Home page before proceeding!
             fig1.update_traces(textinfo="percent+label+value")
             st.plotly_chart(fig1)
 
-            # **Fix for the bar chart - Count the students per Jurusan and Kategori Terbaik**
-            count_df = result_df.groupby(['Jurusan', 'Kategori Terbaik']).size().reset_index(name='Total Siswa')
+            # Menggunakan indeks untuk mengakses kolom Jurusan dan Kategori Terbaik
+            count_df = result_df.groupby([result_df.columns[2], result_df.columns[3]]).size().reset_index(name='Total Siswa')
 
             # Create the bar chart with correct count of students
             fig2 = px.bar(count_df, 
-                          x="Jurusan", 
-                          y="Total Siswa", 
-                          color="Kategori Terbaik", 
-                          title="Number of Students by Class and Placement Category",       
-                          labels={"Jurusan": "Class", "Kategori Terbaik": "PKL Placement Category", "Total Siswa":"Total Students"},
-                          category_orders={"Kategori Terbaik": ["Mobile Engineering", "Software Engineering", "Internet of Things"]},
-                          color_discrete_map={"Mobile Engineering": "lightcoral", 
-                                              "Software Engineering": "lightgreen", 
-                                              "Internet of Things": "lightblue"})
+                        x=result_df.columns[2],  # Dinamis menggunakan kolom indeks ke-2 (Jurusan)
+                        y="Total Siswa", 
+                        color=result_df.columns[3],  # Dinamis menggunakan kolom indeks ke-3 (Kategori Terbaik)
+                        title="Number of Students by Class and Placement Category",       
+                        labels={result_df.columns[2]: "Class", result_df.columns[3]: "PKL Placement Category", "Total Siswa": "Total Students"},
+                        category_orders={result_df.columns[3]: ["Mobile Engineering", "Software Engineering", "Internet of Things"]},
+                        color_discrete_map={"Mobile Engineering": "lightcoral", 
+                                            "Software Engineering": "lightgreen", 
+                                            "Internet of Things": "lightblue"})
 
             # Adjust plot size and font size
             fig2.update_layout(
@@ -151,6 +151,7 @@ Please read the instructions in the Home page before proceeding!
             # Add count labels on bars
             fig2.update_traces(texttemplate='%{y}', textposition='outside', cliponaxis=False)
 
+            # Show the bar chart
             st.plotly_chart(fig2)
 
 if __name__ == "__main__":
