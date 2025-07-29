@@ -131,6 +131,7 @@ If you need the template to ensure your data is properly formatted, you can down
 - Use the left sidebar for navigation:
   - 🔍 **Home**
   - 📚 **PKL Placement Prediction**
+  - 🤖 **Try On!**
 
 - Upload student report card data in **.xlsx** format to make PKL placement predictions.
 - The model will process the report card data and display the most suitable PKL placement prediction along with the confidence level.
