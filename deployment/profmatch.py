@@ -60,15 +60,16 @@ Please read the instructions in the Home page before proceeding!
                 total, kategori_terbaik = model.inference(sub_aspek_data)
 
                 # Ambil nama kolom dari nilai pada baris A, B, dan N
-                nisn = row[row["A"]]  # Ambil nilai dari kolom yang ditunjuk oleh nilai pada row["A"]
-                nama_lengkap = row[row["B"]]  # Ambil nilai dari kolom yang ditunjuk oleh nilai pada row["B"]
-                jurusan = row[row["N"]]  # Ambil nilai dari kolom yang ditunjuk oleh nilai pada row["N"]
+                nisn = row.iloc[0]  # Kolom A (indeks 0)
+                nama_lengkap = row.iloc[1]  # Kolom B (indeks 1)
+                jurusan = row.iloc[13]  # Kolom N (indeks 13) (Kolom N adalah kolom ke-14 karena indeks mulai dari 0)
+
 
                 # Prepare the result for this row
                 predictions = {
-                    row["A"]: nisn,  # Dinamis, menggunakan nilai dari row["A"] sebagai nama kolom
-                    row["B"]: nama_lengkap,  # Dinamis, menggunakan nilai dari row["B"] sebagai nama kolom
-                    row["N"]: jurusan,  # Dinamis, menggunakan nilai dari row["N"] sebagai nama kolom
+                    row.iloc[0]: nisn,  # Dinamis, menggunakan nilai di row[0] sebagai nama kolom
+                    row.iloc[1]: nama_lengkap,  # Dinamis, menggunakan nilai di row[1] sebagai nama kolom
+                    row.iloc[13]: jurusan,  # Dinamis, menggunakan nilai di row[13] sebagai nama kolom
                     "Kategori Terbaik": kategori_terbaik,
                     "Total Nilai": total
                 }
