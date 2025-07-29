@@ -1,78 +1,117 @@
-import streamlit as st # type:ignore
+import streamlit as st  # type:ignore
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def show():
-    st.title("📊 Dashboard Penempatan PKL SMK Negeri 2 Malang")
+    # Title of the Dashboard
+    st.title("📊 PKL Placement Dashboard for SMK Negeri 2 Malang")
 
+    # Description: About the Application
+    # Section: Purpose of the Dashboard
     st.markdown("""
-### 🎯 Tujuan Dashboard
+## 💡 About
 
-Dashboard ini dikembangkan untuk:
-- Mengeksplorasi data siswa SMK berdasarkan hasil rapot dan penempatan PKL.
-- Memprediksi kategori penempatan PKL yang paling sesuai untuk siswa: **Mobile Engineering**, **Software Engineering**, atau **Internet of Things**.
-- Menyajikan visualisasi performa pemodelan dan proses seleksi penempatan PKL.
+This application is designed to help determine the **most appropriate PKL placement** for students based on their academic performance and skills. 
+By uploading an Excel file with student data, the app will use a **Profile Matching Algorithm** to provide personalized PKL placement recommendations.
+
+---
+                
+### 📚 The dashboard was developed to:
+- Explore student data from SMK based on their report card results and PKL placements.
+- Predict the most suitable PKL placement category for students: **Mobile Engineering**, **Software Engineering**, or **Internet of Things**.
+- Present visualizations of the modeling performance and PKL placement selection process.
+
+---
+                
+## 🗺️ How It Works:
+1. **Upload Your Data**: Simply drag and drop an Excel file with student data in the required format.
+2. **Data Review**: After uploading, you will see a preview of the data, including student names, their grades across various subjects (A1-A11), and their class (`Kelas`).
+3. **Prediction**: Once the data is uploaded, click on the **"🔍 Predict!"** button to receive the **recommended PKL placement** for each student, based on their academic performance.
+4. **Download Results**: You can download the results in an **Excel file**, which will include the recommended PKL category for each student along with their total score.
 
 ---
 
-### 💡 Latar Belakang Studi Kasus
+### 🎨 What do A1 to A11 represent?
+These represent the **different subjects/competencies** that will be evaluated for each student. Here's what each code stands for:
+| **Subject**                                   | **Code** | **Description**                               |
+| --------------------------------------------- | -------- | --------------------------------------------- |
+| Informatika                                   | A1       | Informatics (Computer Science)                |
+| Dasar Program Keahlian                        | A2       | Basic Program Expertise                       |
+| Projek Kreatif dan Kewirausahaan              | A3       | Creative Projects and Entrepreneurship        |
+| Perencanaan dan Pengalamatan Jaringan         | A4       | Network Planning and Addressing               |
+| Administrasi Sistem Jaringan                  | A5       | Network System Administration                 |
+| Teknologi Jaringan Kabel dan Nirkabel         | A6       | Cable and Wireless Network Technologies       |
+| Pemasangan dan Konfigurasi Perangkat Jaringan | A7       | Network Device Installation and Configuration |
+| Samsung Tech Institute                        | A8       | Samsung Tech Certification                    |
+| Pemrograman Web                               | A9       | Web Programming                               |
+| Internet of Things                            | A10      | IoT Technologies                              |
+| Jarak                                         | A11      | Distance (specific to program)                |
 
-Saya adalah seorang **data scientist** di sebuah lembaga pendidikan di Jakarta. Seiring dengan meningkatnya kebutuhan akan penempatan PKL yang lebih **personalisasi** dan berbasis data, tim kami berinisiatif mengembangkan teknologi berbasis *machine learning* untuk membantu penentuan penempatan PKL siswa SMK secara otomatis.
-
+Once your data is uploaded, the algorithm will use this information to predict the best PKL category for each student based on their performance in these subjects.
+                
 ---
-
-### 🧠 Arsitektur Model
-
-Model yang digunakan berbasis **ResNet50** pretrained yang digunakan sebagai feature extractor dengan beberapa lapisan tambahan seperti **Dense**, **Dropout**, dan **BatchNormalization** untuk klasifikasi penempatan PKL. Model ini dilatih untuk memprediksi penempatan siswa ke 3 kategori: **Mobile Engineering**, **Software Engineering**, dan **Internet of Things**.
-
-Optimisasi menggunakan **SGD** (learning rate 0.001, momentum 0.9), dan **EarlyStopping** untuk mencegah overfitting.
-
-**Hasil Evaluasi:**
--  Akurasi Data Train: **35.8%**
--  Akurasi Data Testing: **34.3%**
--  Model terkadang mengalami kesulitan dalam mengklasifikasikan penempatan yang tepat untuk beberapa siswa
--  Skor f1 untuk kategori *Mobile Engineering* dan *Software Engineering* masih rendah
-
-> Kesimpulan: Model menunjukkan potensi yang baik tetapi masih memerlukan penyempurnaan lebih lanjut untuk meningkatkan kualitas prediksi, terutama pada data yang lebih beragam.
-
----
-
-### 📁 Dataset yang Digunakan
-
-Model ini dilatih menggunakan dataset yang mencakup data siswa SMK, termasuk hasil rapot dan jenis penempatan PKL.
-
-- **Dataset Asli** berasal dari hasil pengolahan internal yang mencakup data berikut:
-  - **Hasil rapot siswa** dari berbagai bidang keahlian
-  - **Penempatan PKL** di beberapa kategori seperti *Mobile Engineering*, *Software Engineering*, dan *Internet of Things*
-
-**Distribusi Penempatan PKL pada Data:**
 """)
+    
 
-    # Tampilkan pie chart
-    labels = ['Mobile Engineering (120)', 'Software Engineering (150)', 'Internet of Things (100)']
-    sizes = [120, 150, 100]
-    colors = ['#8ecae6', '#ffb703', '#fb8500']
 
-    fig, ax = plt.subplots(figsize=(3.5, 3.5))
-    ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
-    ax.axis('equal')
-    st.pyplot(fig)
+    # Section: Dataset and Distribution
+    st.markdown("""
+### 📁 Dataset Used
+
+This model is trained using a dataset that includes student data from SMK, covering their report card results and types of PKL placements.
+
+- **Original Dataset** comes from internal processing, including the following data:
+  - **Student report card results** across various fields of study
+  - **PKL placements** across categories such as *Mobile Engineering*, *Software Engineering*, and *Internet of Things*
+
+**Here are the example of data used for predicting PKL Placement:**
+""")
+    
+    # Create and display dummy dataset
+    data = {
+        "NIS": [17045, 17046, 17047, 17048, 17049],
+        "Full Name": [
+            "MUHAMMAD HANS ADICANDRA KU",
+            "MUHAMMAD YUSUF ALFARIZQI",
+            "PUTRI ANGGITA NUR HASANAH",
+            "RADITIYA ILHAM PUTRA",
+            "RAFA GASTIADIRRIJAL FAWAS"
+        ],
+        "A1": [79.5, 74.5, 77.5, 83, 75.5],
+        "A2": [84, 80.5, 86.5, 92.5, 81.5],
+        "A3": [85.5, 80.5, 88, 94.5, 84.5],
+        "A4": [75.5, 83, 87.5, 88, 78.5],
+        "A5": [80.5, 82.5, 85.5, 88, 84.5],
+        "A6": [88.5, 82.5, 88.5, 89, 90.5],
+        "A7": [85, 82.5, 89.5, 79.5, 81],
+        "A8": [76, 84, 79.5, 81.5, 80],
+        "A9": [88, 75, 90, 85, 80],  # Added values for Web Programming (A9)
+        "A10": [92, 80, 85, 90, 82],  # Added values for Internet of Things (A10)
+        "A11": [4.4, 3, 2.5, 7.7, 3.9],
+        "Major": ["TKJ 1", "TKJ 2", "TKJ 3", "TKJ 1", "TKJ 2"]
+    }
+    df = pd.DataFrame(data)
+    st.dataframe(df)
 
     st.markdown("---")
 
+    # Section: How to Use the Application
     st.markdown("""
-### 🛠️ Petunjuk Penggunaan Aplikasi
+### 🛠️ How to Use the Application
 
-- Gunakan sidebar di sebelah kiri untuk navigasi:
-  - 🔍 Home
-  - 📊 Explanatory Data Analysis
-  - 📚 Prediksi Penempatan PKL
+- Use the left sidebar for navigation:
+  - 🔍 **Home**
+  - 📚 **PKL Placement Prediction**
 
-- Unggah data rapot siswa dalam format **.csv** untuk melakukan prediksi penempatan PKL
-- Model akan memproses data rapot dan menampilkan hasil prediksi penempatan PKL yang paling sesuai, beserta tingkat kepercayaannya.
+- Upload student report card data in **.xlsx** format to make PKL placement predictions.
+- The model will process the report card data and display the most suitable PKL placement prediction along with the confidence level.
 
-- Hasil prediksi ini berguna untuk memberikan rekomendasi penempatan PKL terbaik berdasarkan hasil analisis dan model yang ada.
+- These predictions are useful for recommending the best PKL placement based on the available analysis and the model.
 
 ---
 
-Selamat mencoba dan semoga aplikasi ini bermanfaat untuk membantu penempatan PKL siswa SMK! 🚀🎓
+Good luck and we hope this application proves helpful in guiding the PKL placement for SMK students! 🚀🎓
 """)
+
+if __name__ == "__main__":
+    show()

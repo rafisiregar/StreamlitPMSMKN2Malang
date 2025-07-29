@@ -36,6 +36,15 @@ class PKLPlacementModel:
         df.columns = [column_mapping.get(col, col) for col in df.columns]
         return df
 
+    def convert_to_numeric(self, df):
+        """
+        Mengonversi kolom A1 hingga A11 menjadi numerik (int atau float)
+        Menangani data yang tidak valid dengan mengganti menjadi NaN
+        """
+        cols = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11']
+        df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
+        return df
+
     def kisaran_rapot(self, rapot):
         if 95 <= rapot <= 100:
             return 8
@@ -117,6 +126,9 @@ class PKLPlacementModel:
         return (total_aspek_1 * 0.6) + (total_aspek_2 * 0.4)
 
     def inference(self, sub_aspek_data):
+        # Pastikan sub_aspek_data sudah dalam format numerik
+        sub_aspek_data = [float(val) if isinstance(val, (int, float)) else 0 for val in sub_aspek_data]
+        
         nilai_penempatan = {}
 
         for jenis_pkl in ["Mobile Engineering", "Software Engineering", "Internet of Things"]:

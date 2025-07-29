@@ -1,6 +1,6 @@
 import streamlit as st  # type: ignore
 import sidebar as sd  
-import pklsmk2
+import profmatch
 import home  
 
 # Set page config (pastikan ini hanya dipanggil sekali)
@@ -14,6 +14,6 @@ if page == "Home":
     home.show() 
 elif page == "PKL Placement":
     # Display PKL Placement page content
-    pklsmk2.main()  
+    profmatch.show()  
 else:
     pass
