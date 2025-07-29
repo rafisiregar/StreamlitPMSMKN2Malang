@@ -104,8 +104,6 @@ If you need the template to ensure your data is properly formatted, you can down
 
     # Create DataFrame
     df = pd.DataFrame(data)
-
-    # Display the dataframe in the Streamlit app
     st.dataframe(df)
 
     # Convert the DataFrame to an Excel file
