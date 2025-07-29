@@ -122,14 +122,14 @@ Please read the instructions in the Home page before proceeding!
             fig1.update_traces(textinfo="percent+label+value")
             st.plotly_chart(fig1)
 
-            # Menggunakan indeks untuk mengakses kolom Jurusan dan Kategori Terbaik
+            # Group by the class (index 2) and placement category (index 3)
             count_df = result_df.groupby([result_df.columns[2], result_df.columns[3]]).size().reset_index(name='Total Siswa')
 
             # Create the bar chart with correct count of students
             fig2 = px.bar(count_df, 
-                        x=result_df.columns[2],  # Dinamis menggunakan kolom indeks ke-2 (Jurusan)
+                        x=result_df.columns[2],  # Class (index 2)
                         y="Total Siswa", 
-                        color=result_df.columns[3],  # Dinamis menggunakan kolom indeks ke-3 (Kategori Terbaik)
+                        color=result_df.columns[3],  # Placement Category (index 3)
                         title="Number of Students by Class and Placement Category",       
                         labels={result_df.columns[2]: "Class", result_df.columns[3]: "PKL Placement Category", "Total Siswa": "Total Students"},
                         category_orders={result_df.columns[3]: ["Mobile Engineering", "Software Engineering", "Internet of Things"]},
